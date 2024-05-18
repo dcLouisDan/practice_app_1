@@ -12,23 +12,27 @@ const showingNavigationDropdown = ref(false);
 <template>
     <div class="bg-gray-100">
         <div class="min-h-screen container mx-auto flex">
-            <nav class="p-3 border-r-2 w-60 border-gray-300">
+            <nav class="p-3 border-r-2 border-gray-300">
                 <ApplicationLogo style="height: 50px" />
-                <div class="mt-4">
+                <div class="mt-4 flex flex-col sm:w-60">
                     <NavLink
                         :href="route('dashboard')"
-                        class="items-center text-2xl flex gap-4 w-full"
+                        class="items-center text-2xl flex gap-4"
                         :active="route().current('dashboard')"
+                        :icon="HomeIcon"
                     >
-                        <home-icon :size="36" />
                         Home
                     </NavLink>
-                    <NavLink class="items-center text-2xl flex gap-4 w-full">
-                        <magnify-icon :size="36" />
+                    <NavLink
+                        :icon="MagnifyIcon"
+                        class="items-center text-2xl flex gap-4"
+                    >
                         Explore
                     </NavLink>
-                    <NavLink class="items-center text-2xl flex gap-4 w-full">
-                        <account-icon :size="36" />
+                    <NavLink
+                        :icon="AccountIcon"
+                        class="items-center text-2xl flex gap-4"
+                    >
                         Profile
                     </NavLink>
                 </div>
@@ -37,7 +41,7 @@ const showingNavigationDropdown = ref(false);
             <main class="flex-1">
                 <slot />
             </main>
-            <section class="w-60 border-l-2"></section>
+            <section class="sm:w-60 border-l-2"></section>
         </div>
     </div>
 </template>

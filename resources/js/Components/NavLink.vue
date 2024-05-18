@@ -10,17 +10,24 @@ const props = defineProps({
     active: {
         type: Boolean,
     },
+    icon: {
+        type: [Object, Function],
+        required: true,
+    },
 });
 
 const classes = computed(() =>
     props.active
-        ? "inline-flex items-center px-1 py-3 font-medium text-lg sm:w-32 leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out"
-        : "inline-flex items-center px-1 py-3 font-medium text-lg sm:w-32 leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out"
+        ? "inline-flex items-center px-1 py-3 font-medium text-lg leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out"
+        : "inline-flex items-center px-1 py-3 font-medium text-lg leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out"
 );
 </script>
 
 <template>
     <Link :href="href" :class="classes">
-        <slot />
+        <icon :is="icon" :size="36" />
+        <div class="hidden sm:block">
+            <slot />
+        </div>
     </Link>
 </template>
