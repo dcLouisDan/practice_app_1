@@ -6,6 +6,7 @@ import NavLink from "@/Components/NavLink.vue";
 import HomeIcon from "vue-material-design-icons/Home.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import AccountIcon from "vue-material-design-icons/Account.vue";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 
 const page = usePage();
 const user = page.props.auth.user;
@@ -13,10 +14,21 @@ const user = page.props.auth.user;
 
 <template>
     <div class="bg-gray-100">
-        <div class="min-h-screen container mx-auto flex">
-            <nav class="p-3 border-r-2 border-gray-300 flex flex-col">
+        <div
+            class="min-h-screen container mx-auto flex relative flex-col sm:flex-row justify-center"
+        >
+            <header
+                class="sticky top-0 w-full flex justify-center py-3 border-b-2 sm:hidden"
+            >
                 <ApplicationLogo style="height: 50px" />
-                <div class="mt-4 flex flex-col sm:w-60 flex-1">
+            </header>
+            <nav
+                class="sm:p-3 border-t-2 w-full sm:w-fit sm:border-r-2 border-gray-300 flex sm:flex-col fixed sm:relative bottom-0 left-0"
+            >
+                <ApplicationLogo style="height: 50px" class="hidden sm:block" />
+                <div
+                    class="p-4 w-full bg-gray-100 sm:p-0 sm:mt-4 flex justify-around sm:justify-normal sm:flex-col sm:w-60 flex-1"
+                >
                     <NavLink
                         :href="route('dashboard')"
                         class="items-center text-2xl flex gap-4"
@@ -40,7 +52,7 @@ const user = page.props.auth.user;
                         Profile
                     </NavLink>
                 </div>
-                <div class="content-end mb-5 flex flex-col">
+                <div class="content-end mb-5 sm:flex flex-col hidden">
                     <div class="text-lg">{{ user.name }}</div>
                     <Link
                         method="post"
@@ -52,7 +64,7 @@ const user = page.props.auth.user;
                 </div>
             </nav>
             <!-- Page Content -->
-            <main class="flex-1">
+            <main class="flex-1 max-w-screen-md">
                 <slot />
             </main>
             <section class="sm:w-60 border-l-2"></section>

@@ -1,22 +1,46 @@
 <script setup>
+import InputError from "@/Components/InputError.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import Chirp from "@/Components/Chirp.vue";
+import { Head, useForm } from "@inertiajs/vue3";
+
+defineProps(["chirps"]);
+
+const form = useForm({
+    message: "",
+});
 </script>
 
 <template>
     <Head title="Home" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Home
-            </h2>
-        </template>
+        <div class="py-5">
+            <div class="mx-auto sm:p-6 lg:p-8">
+                <form
+                    @submit.prevent="
+                        form.post(route('chirps.store'), {
+                            onSuccess: () => form.reset(),
+                        })
+                    "
+                    class="flex flex-col"
+                >
+                    <textarea
+                        v-model="form.message"
+                        placeholder="What's on your mind"
+                        class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
+                    ></textarea>
+                    <InputError :message="form.errors.message" class="mt-2" />
+                    <PrimaryButton class="mt-4 ms-auto">Chirp</PrimaryButton>
+                </form>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">You're logged in!</div>
+                <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
+                    <Chirp
+                        v-for="chirp in chirps"
+                        :key="chirp.id"
+                        :chirp="chirp"
+                    />
                 </div>
             </div>
         </div>
