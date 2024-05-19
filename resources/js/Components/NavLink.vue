@@ -26,7 +26,7 @@ const classes = computed(() =>
 <template>
     <Link :href="href" :class="classes">
         <icon :is="icon" :size="36" />
-        <div class="hidden sm:block">
+        <div class="hidden lg:block">
             <slot />
         </div>
     </Link>

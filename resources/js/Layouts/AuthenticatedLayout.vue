@@ -27,7 +27,7 @@ const user = page.props.auth.user;
             >
                 <ApplicationLogo style="height: 50px" class="hidden sm:block" />
                 <div
-                    class="p-4 w-full bg-gray-100 sm:p-0 sm:mt-4 flex justify-around sm:justify-normal sm:flex-col sm:w-60 flex-1"
+                    class="p-4 w-full bg-gray-100 sm:p-0 sm:mt-4 flex justify-around sm:justify-normal sm:flex-col lg:w-60 flex-1"
                 >
                     <NavLink
                         :href="route('dashboard')"
@@ -52,7 +52,7 @@ const user = page.props.auth.user;
                         Profile
                     </NavLink>
                 </div>
-                <div class="content-end mb-5 sm:flex flex-col hidden">
+                <div class="content-end mb-5 lg:flex flex-col hidden">
                     <div class="text-lg">{{ user.name }}</div>
                     <Link
                         method="post"
@@ -67,7 +67,7 @@ const user = page.props.auth.user;
             <main class="flex-1 max-w-screen-md">
                 <slot />
             </main>
-            <section class="sm:w-60 border-l-2"></section>
+            <section class="hidden lg:block lg:w-60 border-l-2"></section>
         </div>
     </div>
 </template>

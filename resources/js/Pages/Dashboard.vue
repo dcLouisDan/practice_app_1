@@ -17,7 +17,7 @@ const form = useForm({
 
     <AuthenticatedLayout>
         <div class="py-5">
-            <div class="mx-auto sm:p-6 lg:p-8">
+            <div class="mx-auto px-4 pb-4 sm:p-6 lg:p-8 border-b-2">
                 <form
                     @submit.prevent="
                         form.post(route('chirps.store'), {
@@ -34,14 +34,9 @@ const form = useForm({
                     <InputError :message="form.errors.message" class="mt-2" />
                     <PrimaryButton class="mt-4 ms-auto">Chirp</PrimaryButton>
                 </form>
-
-                <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
-                    <Chirp
-                        v-for="chirp in chirps"
-                        :key="chirp.id"
-                        :chirp="chirp"
-                    />
-                </div>
+            </div>
+            <div class="divide-y border-b-2">
+                <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
             </div>
         </div>
     </AuthenticatedLayout>
