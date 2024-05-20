@@ -23,7 +23,7 @@ const user = page.props.auth.user;
                 <ApplicationLogo style="height: 50px" />
             </header>
             <nav
-                class="sm:p-3 border-t-2 w-full sm:w-fit sm:border-r-2 border-gray-300 flex sm:flex-col fixed sm:relative bottom-0 left-0"
+                class="sm:p-3 border-t-2 sm:border-t-0 w-full sm:w-fit border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:min-h-screen sm:max-h-screen"
             >
                 <ApplicationLogo style="height: 50px" class="hidden sm:block" />
                 <div
@@ -53,7 +53,12 @@ const user = page.props.auth.user;
                     </NavLink>
                 </div>
                 <div class="content-end mb-5 lg:flex flex-col hidden">
-                    <div class="text-lg">{{ user.name }}</div>
+                    <Link
+                        :href="route('profile.edit')"
+                        as="button"
+                        class="text-lg text-gray-800 hover:text-gray-900 text-start"
+                        >{{ user.name }}</Link
+                    >
                     <Link
                         method="post"
                         class="text-sm text-gray-600 hover:text-gray-800 text-start"
@@ -64,7 +69,7 @@ const user = page.props.auth.user;
                 </div>
             </nav>
             <!-- Page Content -->
-            <main class="flex-1 max-w-screen-md">
+            <main class="flex-1 max-w-screen-md sm:border-l-2">
                 <slot />
             </main>
             <section class="hidden lg:block lg:w-60 border-l-2"></section>
