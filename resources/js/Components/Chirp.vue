@@ -5,18 +5,30 @@ import InputError from "./InputError.vue";
 import DropdownLink from "./DropdownLink.vue";
 import Dropdown from "./Dropdown.vue";
 import PrimaryButton from "./PrimaryButton.vue";
-import { ref } from "vue";
-import { useForm } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+import { useForm, usePage } from "@inertiajs/vue3";
 
 dayjs.extend(relativeTime);
-
-const props = defineProps(["chirp"]);
-
+const page = usePage();
+const props = defineProps(["chirp", "isLiked"]);
 const form = useForm({
     message: props.chirp.message,
 });
+const likeCount = computed(() => props.chirp.likes.length);
 
-const liked = ref(false);
+const likeChirp = async () => {
+    await axios.post(route("chirps.like", props.chirp.id)).then((response) => {
+        page.props.chirps = response.data;
+    });
+};
+const unlikeChirp = async () => {
+    await axios
+        .delete(route("chirps.unlike", props.chirp.id))
+        .then((response) => {
+            page.props.chirps = response.data;
+        });
+};
 
 const editing = ref(false);
 </script>
@@ -116,12 +128,32 @@ const editing = ref(false);
             </div>
         </div>
         <div class="py-2 px-8 flex">
-            <button class="text-gray-500" v-if="liked" @click="liked = false">
+            <button class="text-gray-500" v-if="isLiked" @click="unlikeChirp">
                 <span class="material-icons">favorite</span>
             </button>
-            <button class="text-gray-500" v-else @click="liked = true">
+            <button class="text-gray-500" v-else @click="likeChirp">
                 <span class="material-icons">favorite_border</span>
             </button>
+
+            <!-- <Link
+                as="button"
+                class="text-gray-500"
+                v-if="isLiked"
+                :href="route('chirps.unlike', chirp.id)"
+                method="delete"
+            >
+                <span class="material-icons">favorite</span>
+            </Link>
+            <Link
+                as="button"
+                class="text-gray-500"
+                v-else
+                :href="route('chirps.like', chirp.id)"
+                method="post"
+            >
+                <span class="material-icons">favorite_border</span>
+            </Link> -->
+            <div>{{ likeCount }}</div>
         </div>
     </div>
 </template>

@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'store'])->name('chirps.like');
-    Route::post('/chirps/{chirp}/like', [LikeController::class, 'destroy'])->name('chirps.unlike');
+    Route::delete('/chirps/{chirp}/unlike', [LikeController::class, 'destroy'])->name('chirps.unlike');
 });
 
 Route::resource('chirps', ChirpController::class)

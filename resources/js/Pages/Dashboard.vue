@@ -3,13 +3,22 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Chirp from "@/Components/Chirp.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 
-defineProps(["chirps"]);
-
+const props = defineProps(["chirps"]);
+const page = usePage();
+const user = page.props.auth.user;
 const form = useForm({
     message: "",
 });
+
+const chirpsWithLikes = computed(() =>
+    props.chirps.map((chirp) => ({
+        ...chirp,
+        isLikedByUser: chirp.likes.some((like) => like.user_id === user.id),
+    }))
+);
 </script>
 
 <template>
@@ -36,7 +45,12 @@ const form = useForm({
                 </form>
             </div>
             <div class="divide-y border-b-2">
-                <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
+                <Chirp
+                    v-for="chirp in chirpsWithLikes"
+                    :key="chirp.id"
+                    :chirp="chirp"
+                    :isLiked="chirp.isLikedByUser"
+                />
             </div>
         </div>
     </AuthenticatedLayout>

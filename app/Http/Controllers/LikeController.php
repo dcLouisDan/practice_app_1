@@ -34,15 +34,17 @@ class LikeController extends Controller
      */
     public function store(Request $request, Chirp $chirp)
     {
-        if ($chirp->likes()->where('user_id', auth()->id())->exist()) {
+        if ($chirp->likes()->where('user_id', auth()->id())->exists()) {
             return response()->json(['message' => 'Already Liked'], 422);
         }
 
-        $like = $chirp->likes()->create([
+        $chirp->likes()->create([
             'user_id' => auth()->id(),
         ]);
 
-        return response()->json($like, 201);
+        $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
+
+        return response()->json($chirps, 201);
     }
 
     /**
@@ -76,6 +78,7 @@ class LikeController extends Controller
     {
         $chirp->likes()->where('user_id', auth()->id())->delete();
 
-        return response()->json(null, 204);
+        $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
+        return response()->json($chirps, 201);
     }
 }
