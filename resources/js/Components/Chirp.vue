@@ -16,15 +16,21 @@ const form = useForm({
     message: props.chirp.message,
 });
 const likeCount = computed(() => props.chirp.likes.length);
-
+console.log(props.chirp.context);
 const likeChirp = async () => {
-    await axios.post(route("chirps.like", props.chirp.id)).then((response) => {
-        page.props.chirps = response.data;
-    });
+    await axios
+        .post(route("chirps.like", props.chirp.id), {
+            context: props.chirp.context,
+        })
+        .then((response) => {
+            page.props.chirps = response.data;
+        });
 };
 const unlikeChirp = async () => {
     await axios
-        .delete(route("chirps.unlike", props.chirp.id))
+        .delete(route("chirps.unlike", props.chirp.id), {
+            data: { context: props.chirp.context },
+        })
         .then((response) => {
             page.props.chirps = response.data;
         });
@@ -53,7 +59,11 @@ const editing = ref(false);
             <div class="flex-1">
                 <div class="flex justify-between items-center">
                     <div>
-                        <span class="text-gray-800">{{ chirp.user.name }}</span>
+                        <Link
+                            :href="route(`profile.show`, chirp.user.id)"
+                            class="text-gray-800"
+                            >{{ chirp.user.name }}</Link
+                        >
                         <small class="ml-2 text-sm text-gray-600">{{
                             dayjs(chirp.created_at).fromNow()
                         }}</small>

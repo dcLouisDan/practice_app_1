@@ -16,8 +16,23 @@ class ChirpController extends Controller
      */
     public function index(): Response
     {
+        $authUserId = auth()->id();
+
+        $ownChirps = Chirp::where('user_id', $authUserId)->with('user:id,name')->with('likes')->latest()->get()->toArray();
+
+        $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
+            $query->select('following_id')
+                ->from('followers')
+                ->where('follower_id', $authUserId);
+        })->with('user:id,name')->with('likes')->latest()->get()->toArray();
+
+        $chirps = array_merge($ownChirps, $followedChirps);
+        usort($chirps, function ($a, $b) {
+            return strtotime($b['created_at']) - strtotime($a['created_at']);
+        });
+
         return Inertia::render('Dashboard', [
-            'chirps' => Chirp::with('user:id,name')->with('likes')->latest()->get(),
+            'chirps' => $chirps
         ]);
     }
 

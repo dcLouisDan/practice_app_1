@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChirpController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -22,12 +23,17 @@ Route::get('/dashboard', [ChirpController::class, 'index'])->middleware(['auth',
 
 Route::middleware('auth')->group(function () {
     Route::get('/account', [ProfileController::class, 'index'])->name('profile.view');
+    Route::get('/account/{user}', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'store'])->name('chirps.like');
     Route::delete('/chirps/{chirp}/unlike', [LikeController::class, 'destroy'])->name('chirps.unlike');
+    Route::post('account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
+    Route::delete('account/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
 });
+
+
 
 Route::resource('chirps', ChirpController::class)
     ->only(['index', 'store', 'update', 'destroy'])

@@ -42,7 +42,14 @@ class LikeController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
+        $context = $request->input('context');
+        if ($context == 'profile') {
+            $chirps = Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get();
+        } else if ($context == 'feed') {
+            $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
+        } else if ($context == 'account') {
+            $chirps = Chirp::where('user_id', $chirp->user->id)->with('user:id,name')->with('likes')->latest()->get();
+        }
 
         return response()->json($chirps, 201);
     }
@@ -74,11 +81,18 @@ class LikeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chirp $chirp)
+    public function destroy(Request $request, Chirp $chirp)
     {
         $chirp->likes()->where('user_id', auth()->id())->delete();
 
-        $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
+        $context = $request->input('context');
+        if ($context == 'profile') {
+            $chirps = Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get();
+        } else if ($context == 'feed') {
+            $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
+        } else if ($context == 'account') {
+            $chirps = Chirp::where('user_id', $chirp->user->id)->with('user:id,name')->with('likes')->latest()->get();
+        }
         return response()->json($chirps, 201);
     }
 }

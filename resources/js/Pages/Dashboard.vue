@@ -17,6 +17,7 @@ const chirpsWithLikes = computed(() =>
     props.chirps.map((chirp) => ({
         ...chirp,
         isLikedByUser: chirp.likes.some((like) => like.user_id === user.id),
+        context: "feed",
     }))
 );
 </script>
@@ -50,6 +51,7 @@ const chirpsWithLikes = computed(() =>
                     :key="chirp.id"
                     :chirp="chirp"
                     :isLiked="chirp.isLikedByUser"
+                    :context="chirp.context"
                 />
             </div>
         </div>

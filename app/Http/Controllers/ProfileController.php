@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Chirp;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,8 +17,25 @@ class ProfileController extends Controller
 {
     public function index(): Response
     {
+        $user = auth()->user();
+
+        $followers = $user->followers;
+        $following = $user->following;
         return Inertia::render('Profile/View', [
             'chirps' => Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get(),
+            'followers' => $followers,
+            'following' => $following,
+        ]);
+    }
+
+    public function show(User $user)
+    {
+        if (auth()->check() && auth()->id() === $user->id) {
+            return Redirect::route('profile.view');
+        }
+        return Inertia::render('Profile/Show', [
+            'user' => $user->load('followers', 'following'),
+            'chirps' => Chirp::where('user_id', $user->id)->with('user:id,name')->with('likes')->latest()->get()
         ]);
     }
     /**

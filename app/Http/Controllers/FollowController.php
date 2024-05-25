@@ -11,13 +11,14 @@ class FollowController extends Controller
     {
         auth()->user()->following()->attach($user->id);
 
-        return back();
+
+        return response()->json($user->fresh()->load(['followers', 'following']), 201);
     }
 
     public function unfollow(User $user)
     {
         auth()->user()->following()->detach($user->id);
 
-        return back();
+        return response()->json($user->fresh()->load(['followers', 'following']), 201);
     }
 }
