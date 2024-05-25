@@ -47,7 +47,8 @@ const user = page.props.auth.user;
                     <NavLink
                         :icon="AccountIcon"
                         class="items-center text-2xl flex gap-4"
-                        href="#"
+                        :active="route().current('profile.view')"
+                        :href="route('profile.view')"
                     >
                         Profile
                     </NavLink>

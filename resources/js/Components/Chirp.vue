@@ -128,31 +128,20 @@ const editing = ref(false);
             </div>
         </div>
         <div class="py-2 px-8 flex">
-            <button class="text-gray-500" v-if="isLiked" @click="unlikeChirp">
-                <span class="material-icons">favorite</span>
-            </button>
-            <button class="text-gray-500" v-else @click="likeChirp">
-                <span class="material-icons">favorite_border</span>
-            </button>
-
-            <!-- <Link
-                as="button"
-                class="text-gray-500"
+            <button
+                class="text-gray-500 active:animate-likeBounce"
                 v-if="isLiked"
-                :href="route('chirps.unlike', chirp.id)"
-                method="delete"
+                @click="unlikeChirp"
             >
                 <span class="material-icons">favorite</span>
-            </Link>
-            <Link
-                as="button"
-                class="text-gray-500"
+            </button>
+            <button
+                class="text-gray-500 active:animate-likeBounce"
                 v-else
-                :href="route('chirps.like', chirp.id)"
-                method="post"
+                @click="likeChirp"
             >
                 <span class="material-icons">favorite_border</span>
-            </Link> -->
+            </button>
             <div>{{ likeCount }}</div>
         </div>
     </div>

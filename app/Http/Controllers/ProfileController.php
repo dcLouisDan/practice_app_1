@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Chirp;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,12 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function index(): Response
+    {
+        return Inertia::render('Profile/View', [
+            'chirps' => Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get(),
+        ]);
+    }
     /**
      * Display the user's profile form.
      */
