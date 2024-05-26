@@ -22,14 +22,8 @@ const imageform = useForm({
     profile_picture: null,
 });
 const user = usePage().props.auth.user;
-const result = reactive({
-    dataURL: "",
-    blobURL: "",
-});
 const selectFile = (e) => {
     pic.value = "";
-    result.dataURL = "";
-    result.blobURL = "";
 
     const { files } = e.target;
     if (!files || !files.length) return;
@@ -49,28 +43,20 @@ const selectFile = (e) => {
 
 const getResult = async () => {
     if (!cropper) return;
-    const base64 = cropper.getDataURL();
     const blob = await cropper.getBlob();
     if (!blob) return;
-
-    const file = await cropper.getFile({
-        fileName: `user-pic-${user.id}`,
-    });
-
-    // console.log({ base64, blob, file });
-    result.dataURL = base64;
-    result.blobURL = URL.createObjectURL(blob);
     isShowModal.value = false;
     imageform.profile_picture = blob;
     console.log(imageform.profile_picture);
     console.log(imageform.processing);
+    uploadImage();
 };
 
 const uploadImage = () => {
     imageform.post(route("profilePicture.update"), {
         onSuccess: (response) => {
             console.log(response);
-            form.reset();
+            imageform.reset();
         },
         onError: (response) => {
             console.log(response);
@@ -96,9 +82,6 @@ const ready = () => {
 const profilePicture = computed(() => {
     return user.profile_picture || "images/profile_placeholder.png";
 });
-const isUploading = computed(() => {
-    return imageform.profile_picture != null;
-});
 </script>
 
 <template>
@@ -111,9 +94,6 @@ const isUploading = computed(() => {
         <PrimaryButton class="w-fit" @click="$refs.uploadInput.click()">
             <span>Upload Profile Picture</span>
         </PrimaryButton>
-        <SecondaryButton v-if="isUploading" @click="uploadImage"
-            >Save Changes</SecondaryButton
-        >
         <input
             class="hidden"
             ref="uploadInput"
@@ -148,7 +128,7 @@ const isUploading = computed(() => {
                 </SecondaryButton>
                 <SecondaryButton @click="clear"> Clear </SecondaryButton>
                 <SecondaryButton @click="reset"> Reset </SecondaryButton>
-                <PrimaryButton @click="getResult"> Crop </PrimaryButton>
+                <PrimaryButton @click="getResult"> Save Changes </PrimaryButton>
             </div>
         </div>
     </Modal>

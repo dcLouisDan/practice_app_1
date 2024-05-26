@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import NavLink from "@/Components/NavLink.vue";
@@ -7,9 +7,11 @@ import HomeIcon from "vue-material-design-icons/Home.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import AccountIcon from "vue-material-design-icons/Account.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-
 const page = usePage();
 const user = page.props.auth.user;
+const profilePicture = computed(() => {
+    return user.profile_picture || "images/profile_placeholder.png";
+});
 </script>
 
 <template>
@@ -53,20 +55,29 @@ const user = page.props.auth.user;
                         Profile
                     </NavLink>
                 </div>
-                <div class="content-end mb-5 lg:flex flex-col hidden">
-                    <Link
-                        :href="route('profile.view')"
-                        as="button"
-                        class="text-lg text-gray-800 hover:text-gray-900 text-start"
-                        >{{ user.name }}</Link
-                    >
-                    <Link
-                        method="post"
-                        class="text-sm text-gray-600 hover:text-gray-800 text-start"
-                        :href="route('logout')"
-                        as="button"
-                        >Logout</Link
-                    >
+                <div class="content-end mb-5 hidden sm:flex gap-3">
+                    <Link :href="route('profile.view')" as="button">
+                        <img
+                            :src="profilePicture"
+                            alt="Profile Picture"
+                            class="rounded-full border-2 border-gray-500 h-12 w-12 object-cover"
+                        />
+                    </Link>
+                    <div class="lg:flex flex-col hidden">
+                        <Link
+                            :href="route('profile.view')"
+                            as="button"
+                            class="text-lg text-gray-800 hover:text-gray-900 text-start"
+                            >{{ user.name }}</Link
+                        >
+                        <Link
+                            method="post"
+                            class="text-sm text-gray-600 hover:text-gray-800 text-start"
+                            :href="route('logout')"
+                            as="button"
+                            >Logout</Link
+                        >
+                    </div>
                 </div>
             </nav>
             <!-- Page Content -->

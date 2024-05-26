@@ -25,7 +25,7 @@ class ProfileController extends Controller
         $followers = $user->followers;
         $following = $user->following;
         return Inertia::render('Profile/View', [
-            'chirps' => Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get(),
+            'chirps' => Chirp::where('user_id', auth()->id())->with('user:id,name,profile_picture')->with('likes')->latest()->get(),
             'followers' => $followers,
             'following' => $following,
         ]);
@@ -38,7 +38,7 @@ class ProfileController extends Controller
         }
         return Inertia::render('Profile/Show', [
             'user' => $user->load('followers', 'following'),
-            'chirps' => Chirp::where('user_id', $user->id)->with('user:id,name')->with('likes')->latest()->get()
+            'chirps' => Chirp::where('user_id', $user->id)->with('user:id,name,profile_picture')->with('likes')->latest()->get()
         ]);
     }
     /**
@@ -89,32 +89,26 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function updateProfilePicture(ProfileImageRequest $request)
+    public function updateProfilePicture(ProfileImageRequest $request): RedirectResponse
     {
-        try {
+        $user = User::find(auth()->id());
 
-            $user = User::find(auth()->id());
+        if ($request->hasFile('profile_picture')) {
+            // Store the uploaded file
 
-            if ($request->hasFile('profile_picture')) {
-                // Store the uploaded file
+            $file =  $request->file('profile_picture');
+            $path = $file->store('profile_pictures', 'public');
 
-                $file =  $request->file('profile_picture');
-                $path = $file->store('public/profile_pictures');
-
-                // Delete old profile picture if exists
-                if ($user->profile_picture) {
-                    Storage::disk('public')->delete($user->profile_picture);
-                }
-
-                // Update user profile picture path
-                $user->profile_picture = $path;
-                $user->save();
+            // Delete old profile picture if exists
+            if ($user->profile_picture) {
+                Storage::disk('public')->delete($user->profile_picture);
             }
 
-            return response()->json($file, 201);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return response()->json(['error' => $e->getMessage(), 'request' => $request], 500);
+            // Update user profile picture path
+            $user->profile_picture = asset("storage/" . $path);
+            $user->save();
         }
+
+        return Redirect::route('profile.view');
     }
 }

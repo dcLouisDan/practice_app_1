@@ -18,7 +18,7 @@ class ChirpController extends Controller
     {
         $authUserId = auth()->id();
 
-        $ownChirps = Chirp::where('user_id', $authUserId)->with('user:id,name')->with('likes')->latest()->get()->toArray();
+        $ownChirps = Chirp::where('user_id', $authUserId)->with('user:id,name,profile_picture')->with('likes')->latest()->get()->toArray();
 
         $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
             $query->select('following_id')
