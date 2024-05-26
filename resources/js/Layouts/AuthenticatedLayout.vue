@@ -55,7 +55,7 @@ const user = page.props.auth.user;
                 </div>
                 <div class="content-end mb-5 lg:flex flex-col hidden">
                     <Link
-                        :href="route('profile.edit')"
+                        :href="route('profile.view')"
                         as="button"
                         class="text-lg text-gray-800 hover:text-gray-900 text-start"
                         >{{ user.name }}</Link

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileImageRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Chirp;
 use App\Models\User;
@@ -9,7 +10,9 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -84,5 +87,34 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function updateProfilePicture(ProfileImageRequest $request)
+    {
+        try {
+
+            $user = User::find(auth()->id());
+
+            if ($request->hasFile('profile_picture')) {
+                // Store the uploaded file
+
+                $file =  $request->file('profile_picture');
+                $path = $file->store('public/profile_pictures');
+
+                // Delete old profile picture if exists
+                if ($user->profile_picture) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                }
+
+                // Update user profile picture path
+                $user->profile_picture = $path;
+                $user->save();
+            }
+
+            return response()->json($file, 201);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['error' => $e->getMessage(), 'request' => $request], 500);
+        }
     }
 }

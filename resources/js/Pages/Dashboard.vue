@@ -46,6 +46,18 @@ const chirpsWithLikes = computed(() =>
                 </form>
             </div>
             <div class="divide-y border-b-2">
+                <div
+                    class="text-center px-5 py-10"
+                    v-if="chirpsWithLikes.length === 0"
+                >
+                    <h1 class="font-bold text-xl">
+                        Not seeing any chirps yet?
+                    </h1>
+                    <p class="text-gray-500">
+                        Follow some users to see their chirps here or be the
+                        first to chirp!
+                    </p>
+                </div>
                 <Chirp
                     v-for="chirp in chirpsWithLikes"
                     :key="chirp.id"

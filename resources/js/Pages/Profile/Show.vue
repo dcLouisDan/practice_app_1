@@ -49,7 +49,7 @@ const unfollow = async () => {
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-lg font-bold">{{ user.name }}</h1>
-                    <p class="text-gray-500">{{ user.email }}</p>
+                    <p class="text-gray-500">@{{ user.username }}</p>
                 </div>
                 <div>
                     <PrimaryButton

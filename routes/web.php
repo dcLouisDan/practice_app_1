@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/account/{user}', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('profile/picture/update', [ProfileController::class, 'updateProfilePicture'])->name('profilePicture.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'store'])->name('chirps.like');
     Route::delete('/chirps/{chirp}/unlike', [LikeController::class, 'destroy'])->name('chirps.unlike');
