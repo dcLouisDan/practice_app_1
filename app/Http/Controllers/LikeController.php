@@ -42,16 +42,9 @@ class LikeController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        $context = $request->input('context');
-        if ($context == 'profile') {
-            $chirps = Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get();
-        } else if ($context == 'feed') {
-            $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
-        } else if ($context == 'account') {
-            $chirps = Chirp::where('user_id', $chirp->user->id)->with('user:id,name')->with('likes')->latest()->get();
-        }
+        $chirp->refresh();
 
-        return response()->json($chirps, 201);
+        return response()->json($chirp->load(['likes', 'user:id,name,profile_picture']), 201);
     }
 
     /**
@@ -85,14 +78,8 @@ class LikeController extends Controller
     {
         $chirp->likes()->where('user_id', auth()->id())->delete();
 
-        $context = $request->input('context');
-        if ($context == 'profile') {
-            $chirps = Chirp::where('user_id', auth()->id())->with('user:id,name')->with('likes')->latest()->get();
-        } else if ($context == 'feed') {
-            $chirps = Chirp::with('user:id,name')->with('likes')->latest()->get();
-        } else if ($context == 'account') {
-            $chirps = Chirp::where('user_id', $chirp->user->id)->with('user:id,name')->with('likes')->latest()->get();
-        }
-        return response()->json($chirps, 201);
+        $chirp->refresh();
+
+        return response()->json($chirp->load(['likes', 'user:id,name,profile_picture']), 201);
     }
 }

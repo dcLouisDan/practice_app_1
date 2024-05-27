@@ -10,13 +10,7 @@ const props = defineProps(["user", "chirps"]);
 const page = usePage();
 const authUser = page.props.auth.user;
 const user = ref(page.props.user);
-const chirpsWithLikes = computed(() =>
-    props.chirps.map((chirp) => ({
-        ...chirp,
-        isLikedByUser: chirp.likes.some((like) => like.user_id === authUser.id),
-        context: "account",
-    }))
-);
+
 const isUnfollowBtnHovered = ref(false);
 const unfollowText = computed(() => {
     return isUnfollowBtnHovered.value ? "Unfollow" : "Following";
@@ -24,8 +18,6 @@ const unfollowText = computed(() => {
 const isFollowingByAuthUser = computed(() => {
     return user.value.followers.some((follower) => follower.id === authUser.id);
 });
-console.table(authUser);
-console.table(props.user.followers);
 const follow = async () => {
     await axios.post(route("user.follow", user.value.id)).then((response) => {
         console.log(response);
@@ -78,13 +70,7 @@ const unfollow = async () => {
             </div>
         </div>
         <div class="divide-y border-b-2">
-            <Chirp
-                v-for="chirp in chirpsWithLikes"
-                :key="chirp.id"
-                :chirp="chirp"
-                :isLiked="chirp.isLikedByUser"
-                :context="chirp.context"
-            />
+            <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
         </div>
     </AuthenticatedLayout>
 </template>

@@ -6,11 +6,11 @@ import NavLink from "@/Components/NavLink.vue";
 import HomeIcon from "vue-material-design-icons/Home.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import AccountIcon from "vue-material-design-icons/Account.vue";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import Search from "@/Components/Search.vue";
 const page = usePage();
 const user = page.props.auth.user;
 const profilePicture = computed(() => {
-    return user.profile_picture || "images/profile_placeholder.png";
+    return user.profile_picture_url || "images/profile_placeholder.png";
 });
 </script>
 
@@ -25,7 +25,7 @@ const profilePicture = computed(() => {
                 <ApplicationLogo style="height: 50px" />
             </header>
             <nav
-                class="sm:p-3 border-t-2 sm:border-t-0 w-full sm:w-fit border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:min-h-screen sm:max-h-screen"
+                class="sm:p-3 border-t-2 sm:border-t-0 w-64 sm:w-fit border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:min-h-screen sm:max-h-screen"
             >
                 <ApplicationLogo style="height: 50px" class="hidden sm:block" />
                 <div
@@ -81,10 +81,12 @@ const profilePicture = computed(() => {
                 </div>
             </nav>
             <!-- Page Content -->
-            <main class="flex-1 max-w-screen-md sm:border-l-2">
+            <main class="flex-1 max-w-screen-sm sm:border-l-2">
                 <slot />
             </main>
-            <section class="hidden lg:block lg:w-60 border-l-2"></section>
+            <section class="hidden lg:block lg:w-64 border-l-2 pt-5 px-3">
+                <Search v-if="!route().current('search')" />
+            </section>
         </div>
     </div>
 </template>

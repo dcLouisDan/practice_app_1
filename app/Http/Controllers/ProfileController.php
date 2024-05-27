@@ -25,7 +25,7 @@ class ProfileController extends Controller
         $followers = $user->followers;
         $following = $user->following;
         return Inertia::render('Profile/View', [
-            'chirps' => Chirp::where('user_id', auth()->id())->with('user:id,name,profile_picture')->with('likes')->latest()->get(),
+            'chirps' => Chirp::where('user_id', auth()->id())->with('user')->with('likes')->latest()->get(),
             'followers' => $followers,
             'following' => $following,
         ]);
@@ -38,7 +38,7 @@ class ProfileController extends Controller
         }
         return Inertia::render('Profile/Show', [
             'user' => $user->load('followers', 'following'),
-            'chirps' => Chirp::where('user_id', $user->id)->with('user:id,name,profile_picture')->with('likes')->latest()->get()
+            'chirps' => Chirp::where('user_id', $user->id)->with('user')->with('likes')->latest()->get()
         ]);
     }
     /**
@@ -105,7 +105,7 @@ class ProfileController extends Controller
             }
 
             // Update user profile picture path
-            $user->profile_picture = asset("storage/" . $path);
+            $user->profile_picture = $path;
             $user->save();
         }
 

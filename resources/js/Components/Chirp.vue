@@ -11,32 +11,36 @@ import { useForm, usePage } from "@inertiajs/vue3";
 
 dayjs.extend(relativeTime);
 const page = usePage();
+const user = page.props.auth.user;
 const props = defineProps(["chirp", "isLiked"]);
+const chirpData = ref(props.chirp);
 const form = useForm({
-    message: props.chirp.message,
+    message: chirpData.value.message,
 });
-const likeCount = computed(() => props.chirp.likes.length);
+const isLiked = computed(() => {
+    return chirpData.value.likes.some((like) => like.user_id === user.id);
+});
+const likeCount = computed(() => chirpData.value.likes.length);
 console.log(props.chirp.context);
 const likeChirp = async () => {
     await axios
-        .post(route("chirps.like", props.chirp.id), {
-            context: props.chirp.context,
-        })
+        .post(route("chirps.like", chirpData.value.id))
         .then((response) => {
-            page.props.chirps = response.data;
+            chirpData.value = response.data;
         });
 };
 const unlikeChirp = async () => {
     await axios
-        .delete(route("chirps.unlike", props.chirp.id), {
-            data: { context: props.chirp.context },
-        })
+        .delete(route("chirps.unlike", chirpData.value.id))
         .then((response) => {
-            page.props.chirps = response.data;
+            chirpData.value = response.data;
         });
 };
 const profilePicture = computed(() => {
-    return props.chirp.user.profile_picture || "images/profile_placeholder.png";
+    return (
+        chirpData.value.user.profile_picture_url ||
+        "images/profile_placeholder.png"
+    );
 });
 
 console.log(props.chirp.user);

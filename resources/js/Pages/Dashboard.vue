@@ -59,10 +59,9 @@ const chirpsWithLikes = computed(() =>
                     </p>
                 </div>
                 <Chirp
-                    v-for="chirp in chirpsWithLikes"
+                    v-for="chirp in chirps"
                     :key="chirp.id"
                     :chirp="chirp"
-                    :isLiked="chirp.isLikedByUser"
                     :context="chirp.context"
                 />
             </div>

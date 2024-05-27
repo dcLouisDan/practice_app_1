@@ -4,6 +4,7 @@ use App\Http\Controllers\ChirpController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [ChirpController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
-
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::middleware('auth')->group(function () {
     Route::get('/account', [ProfileController::class, 'index'])->name('profile.view');
     Route::get('/account/{user}', [ProfileController::class, 'show'])->name('profile.show');
