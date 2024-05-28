@@ -21,6 +21,7 @@ const isLiked = computed(() => {
     return chirpData.value.likes.some((like) => like.user_id === user.id);
 });
 const likeCount = computed(() => chirpData.value.likes.length);
+const replyCount = computed(() => chirpData.value.replies.length);
 console.log(props.chirp.context);
 const likeChirp = async () => {
     await axios
@@ -49,32 +50,39 @@ const editing = ref(false);
 </script>
 
 <template>
-    <div class="flex flex-col">
-        <div class="p-6 flex space-x-4">
-            <img
-                :src="profilePicture"
-                alt="Profile Picture"
-                class="rounded-full border-2 border-gray-500 h-12 w-12 object-cover"
-            />
+    <div class="flex flex-col relative">
+        <div class="p-6 flex space-x-4 z-10 pointer-events-none">
+            <Link
+                :href="route(`profile.show`, chirpData.user.id)"
+                class="pointer-events-auto"
+            >
+                <img
+                    :src="profilePicture"
+                    alt="Profile Picture"
+                    class="rounded-full border-2 border-gray-500 h-12 w-12 object-cover"
+                />
+            </Link>
 
             <div class="flex-1">
                 <div class="flex justify-between items-center">
                     <div>
                         <Link
-                            :href="route(`profile.show`, chirp.user.id)"
-                            class="text-gray-800"
-                            >{{ chirp.user.name }}</Link
+                            :href="route(`profile.show`, chirpData.user.id)"
+                            class="text-gray-800 pointer-events-auto"
+                            >{{ chirpData.user.name }}</Link
                         >
                         <small class="ml-2 text-sm text-gray-600">{{
-                            dayjs(chirp.created_at).fromNow()
+                            dayjs(chirpData.created_at).fromNow()
                         }}</small>
                         <small
-                            v-if="chirp.created_at !== chirp.updated_at"
+                            v-if="chirpData.created_at !== chirpData.updated_at"
                             class="text-sm text-gray-600"
                             >&middot; edited</small
                         >
                     </div>
-                    <Dropdown v-if="chirp.user.id === $page.props.auth.user.id">
+                    <Dropdown
+                        v-if="chirpData.user.id === $page.props.auth.user.id"
+                    >
                         <template #trigger>
                             <button>
                                 <svg
@@ -98,7 +106,7 @@ const editing = ref(false);
                             </button>
                             <DropdownLink
                                 as="button"
-                                :href="route('chirps.destroy', chirp.id)"
+                                :href="route('chirps.destroy', chirpData.id)"
                                 method="delete"
                             >
                                 Delete
@@ -109,7 +117,7 @@ const editing = ref(false);
                 <form
                     v-if="editing"
                     @submit.prevent="
-                        form.put(route('chirps.update', chirp.id), {
+                        form.put(route('chirps.update', chirpData.id), {
                             onSuccess: () => (editing = false),
                         })
                     "
@@ -134,26 +142,39 @@ const editing = ref(false);
                     </div>
                 </form>
                 <p v-else class="mt-4 text-lg text-gray-900">
-                    {{ chirp.message }}
+                    {{ chirpData.message }}
                 </p>
             </div>
         </div>
-        <div class="py-2 px-8 flex">
-            <button
-                class="text-gray-500 active:animate-likeBounce"
-                v-if="isLiked"
-                @click="unlikeChirp"
-            >
-                <span class="material-icons">favorite</span>
-            </button>
-            <button
-                class="text-gray-500 active:animate-likeBounce"
-                v-else
-                @click="likeChirp"
-            >
-                <span class="material-icons">favorite_border</span>
-            </button>
-            <div>{{ likeCount }}</div>
+        <div class="py-2 px-8 flex z-10 justify-around">
+            <div class="flex gap-2">
+                <button class="text-gray-500">
+                    <span class="material-icons">comment</span>
+                </button>
+                <div>{{ replyCount }}</div>
+            </div>
+            <div class="flex gap-2">
+                <button
+                    class="text-gray-500 active:animate-likeBounce"
+                    v-if="isLiked"
+                    @click="unlikeChirp"
+                >
+                    <span class="material-icons">favorite</span>
+                </button>
+                <button
+                    class="text-gray-500 active:animate-likeBounce"
+                    v-else
+                    @click="likeChirp"
+                >
+                    <span class="material-icons">favorite_border</span>
+                </button>
+                <div>{{ likeCount }}</div>
+            </div>
         </div>
+        <Link
+            :href="route('chirp.show', chirpData.id)"
+            v-if="!route().current('chirp.show', chirpData.id)"
+            class="absolute h-full w-full"
+        ></Link>
     </div>
 </template>

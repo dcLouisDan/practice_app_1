@@ -7,26 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Chirp extends Model
+class Reply extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'message'
-    ];
+    public function chirp(): BelongsTo
+    {
+        return $this->belongsTo(Chirp::class);
+    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function likes(): HasMany
+    public function parent(): BelongsTo
     {
-        return $this->hasMany(Like::class);
+        return $this->belongsTo(Reply::class, 'parent_id');
     }
 
-    public function replies(): HasMany
+    public function children(): HasMany
     {
-        return $this->hasMany(Reply::class);
+        return $this->hasMany(Reply::class, 'parent_id');
     }
 }

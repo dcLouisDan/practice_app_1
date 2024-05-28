@@ -18,13 +18,13 @@ class ChirpController extends Controller
     {
         $authUserId = auth()->id();
 
-        $ownChirps = Chirp::where('user_id', $authUserId)->with('user')->with('likes')->latest()->get()->toArray();
+        $ownChirps = Chirp::where('user_id', $authUserId)->with('user')->with('likes')->with('replies')->latest()->get()->toArray();
 
         $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
             $query->select('following_id')
                 ->from('followers')
                 ->where('follower_id', $authUserId);
-        })->with('user:id,name,profile_picture')->with('likes')->latest()->get()->toArray();
+        })->with('user:id,name,profile_picture')->with('likes')->with('replies')->latest()->get()->toArray();
 
         $chirps = array_merge($ownChirps, $followedChirps);
         usort($chirps, function ($a, $b) {
@@ -64,7 +64,9 @@ class ChirpController extends Controller
      */
     public function show(Chirp $chirp)
     {
-        //
+        return Inertia::render('ChirpPage', [
+            'chirp' => $chirp->load(['user', 'replies', 'likes'])
+        ]);
     }
 
     /**

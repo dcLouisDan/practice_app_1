@@ -40,7 +40,7 @@ const unfollow = async () => {
         <div class="px-3 py-5 border-b-2">
             <div class="px-4 py-10">
                 <img
-                    :src="user.profile_picture"
+                    :src="user.profile_picture_url"
                     alt="Profile Picture"
                     class="rounded-full border-4 border-gray-500 h-36 w-36 object-cover"
                 />

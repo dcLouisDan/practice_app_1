@@ -3,16 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chirp;
-use App\Models\Like;
+use App\Models\Reply;
 use Illuminate\Http\Request;
 
-class LikeController extends Controller
+class ReplyController extends Controller
 {
-
-    public function unlike(Chirp $chirp)
-    {
-    }
-
     /**
      * Display a listing of the resource.
      */
@@ -34,23 +29,26 @@ class LikeController extends Controller
      */
     public function store(Request $request, Chirp $chirp)
     {
-        if ($chirp->likes()->where('user_id', auth()->id())->exists()) {
-            return response()->json(['message' => 'Already Liked'], 422);
-        }
-
-        $chirp->likes()->create([
-            'user_id' => auth()->id(),
+        $request->validate([
+            'message' => 'required|max:255',
+            'parent_id' => 'nullable|exists:replies,id'
         ]);
 
-        $chirp->refresh();
+        $reply = new Reply([
+            'user_id' => auth()->id(),
+            'message' => $request->message,
+            'parent_id' => $request->parent_id,
+        ]);
 
-        return response()->json($chirp->load(['likes', 'user', 'replies']), 201);
+        $chirp->replies()->save($reply);
+
+        return response()->json($chirp->refresh(), 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Like $like)
+    public function show(Reply $reply)
     {
         //
     }
@@ -58,7 +56,7 @@ class LikeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Like $like)
+    public function edit(Reply $reply)
     {
         //
     }
@@ -66,7 +64,7 @@ class LikeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Like $like)
+    public function update(Request $request, Reply $reply)
     {
         //
     }
@@ -74,12 +72,8 @@ class LikeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Chirp $chirp)
+    public function destroy(Reply $reply)
     {
-        $chirp->likes()->where('user_id', auth()->id())->delete();
-
-        $chirp->refresh();
-
-        return response()->json($chirp->load(['likes', 'user', 'replies']), 201);
+        //
     }
 }
