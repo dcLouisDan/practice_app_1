@@ -11,16 +11,9 @@ import DropdownLink from "@/Components/DropdownLink.vue";
 const props = defineProps(["chirps", "followers", "following"]);
 const page = usePage();
 const user = page.props.auth.user;
-const chirpsWithLikes = computed(() =>
-    props.chirps.map((chirp) => ({
-        ...chirp,
-        isLikedByUser: chirp.likes.some((like) => like.user_id === user.id),
-        context: "profile",
-    }))
-);
 
 const profilePicture = computed(() => {
-    return user.profile_picture_url || "images/profile_placeholder.png";
+    return user.profile_picture || "images/profile_placeholder.png";
 });
 </script>
 
@@ -85,13 +78,7 @@ const profilePicture = computed(() => {
             </div>
         </div>
         <div class="divide-y border-b-2">
-            <Chirp
-                v-for="chirp in chirpsWithLikes"
-                :key="chirp.id"
-                :chirp="chirp"
-                :isLiked="chirp.isLikedByUser"
-                :context="chirp.context"
-            />
+            <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
         </div>
     </AuthenticatedLayout>
 </template>

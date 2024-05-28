@@ -14,6 +14,12 @@ class SearchController extends Controller
     {
         $query = $request->input('query');
 
+        if ($query == "") {
+            return Inertia::render('SearchResult', [
+                'query' => ''
+            ]);
+        }
+
         $users = User::where('id', '!=', auth()->id())
             ->where(function ($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")

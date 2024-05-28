@@ -9,7 +9,7 @@ const user = ref(props.user);
 const page = usePage();
 const authUser = page.props.auth.user;
 const profilePicture = computed(() => {
-    return user.value.profile_picture || "images/profile_placeholder.png";
+    return user.value.profile_picture;
 });
 
 const isUnfollowBtnHovered = ref(false);

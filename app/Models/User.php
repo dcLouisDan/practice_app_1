@@ -76,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function profilePicture(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => asset('storage/' . $value)
+            get: fn (?string $value) => $value ? asset('storage/' . $value) : asset('images/profile_placeholder.png')
         );
     }
 }

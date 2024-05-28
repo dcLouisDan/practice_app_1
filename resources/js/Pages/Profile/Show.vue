@@ -38,6 +38,13 @@ const unfollow = async () => {
     <Head title="Profile" />
     <AuthenticatedLayout>
         <div class="px-3 py-5 border-b-2">
+            <div class="px-4 py-10">
+                <img
+                    :src="user.profile_picture"
+                    alt="Profile Picture"
+                    class="rounded-full border-4 border-gray-500 h-36 w-36 object-cover"
+                />
+            </div>
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-lg font-bold">{{ user.name }}</h1>

@@ -38,8 +38,7 @@ const unlikeChirp = async () => {
 };
 const profilePicture = computed(() => {
     return (
-        chirpData.value.user.profile_picture_url ||
-        "images/profile_placeholder.png"
+        chirpData.value.user.profile_picture || "images/profile_placeholder.png"
     );
 });
 

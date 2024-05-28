@@ -1,9 +1,19 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useForm } from "@inertiajs/vue3";
 
-const props = defineProps(["query"]);
+const props = defineProps({
+    query: String,
+    isFocused: { type: Boolean, default: false },
+});
 const form = useForm({ query: props.query });
+const input = ref(null);
+
+onMounted(() => {
+    if (props.isFocused) {
+        input.value.focus();
+    }
+});
 </script>
 
 <template>

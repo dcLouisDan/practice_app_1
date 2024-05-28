@@ -12,14 +12,6 @@ const user = page.props.auth.user;
 const form = useForm({
     message: "",
 });
-
-const chirpsWithLikes = computed(() =>
-    props.chirps.map((chirp) => ({
-        ...chirp,
-        isLikedByUser: chirp.likes.some((like) => like.user_id === user.id),
-        context: "feed",
-    }))
-);
 </script>
 
 <template>
@@ -46,10 +38,7 @@ const chirpsWithLikes = computed(() =>
                 </form>
             </div>
             <div class="divide-y border-b-2">
-                <div
-                    class="text-center px-5 py-10"
-                    v-if="chirpsWithLikes.length === 0"
-                >
+                <div class="text-center px-5 py-10" v-if="chirps.length === 0">
                     <h1 class="font-bold text-xl">
                         Not seeing any chirps yet?
                     </h1>
@@ -58,12 +47,7 @@ const chirpsWithLikes = computed(() =>
                         first to chirp!
                     </p>
                 </div>
-                <Chirp
-                    v-for="chirp in chirps"
-                    :key="chirp.id"
-                    :chirp="chirp"
-                    :context="chirp.context"
-                />
+                <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
             </div>
         </div>
     </AuthenticatedLayout>
