@@ -28,6 +28,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_picture'
     ];
 
+    protected $appends = ['profile_picture_url'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -73,10 +75,12 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
-    protected function profilePicture(): Attribute
+    protected function profilePictureUrl(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ? asset('storage/' . $value) : asset('images/profile_placeholder.png')
+            get: fn ($value, $attributes) => $attributes['profile_picture']
+                ? asset('storage/' . $attributes['profile_picture'])
+                : asset('images/profile_placeholder.png')
         );
     }
 }

@@ -10,7 +10,7 @@ import Search from "@/Components/Search.vue";
 const page = usePage();
 const user = page.props.auth.user;
 const profilePicture = computed(() => {
-    return user.profile_picture || "images/profile_placeholder.png";
+    return user.profile_picture_url || "images/profile_placeholder.png";
 });
 </script>
 
