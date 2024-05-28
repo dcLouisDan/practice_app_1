@@ -105,7 +105,7 @@ const profilePicture = computed(() => {
 
     <Modal :show="isShowModal" maxWidth="xl">
         <div>
-            <div class="p-4 rounded-lg overflow-hidden">
+            <div class="p-4 rounded-lg overflow-hidden max-h-[600px]">
                 <VuePictureCropper
                     :boxStyle="{
                         width: '100%',
