@@ -88,4 +88,14 @@ class User extends Authenticatable implements MustVerifyEmail
                 : asset('images/profile_placeholder.png')
         );
     }
+
+    public function unfollowedUsers($perPage = 10)
+    {
+        $followingIds = $this->following()->pluck('users.id')->toArray();
+
+        return User::whereNotIn('id', $followingIds)
+            ->where('id', '<>', $this->id)
+            ->with('followers')
+            ->paginate($perPage);
+    }
 }

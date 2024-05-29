@@ -23,6 +23,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [ChirpController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/recommend/users', [ProfileController::class, 'recommendUsers'])->name('users.recommend');
 Route::middleware('auth')->group(function () {
     Route::get('/account', [ProfileController::class, 'index'])->name('profile.view');
     Route::get('/account/{user}', [ProfileController::class, 'show'])->name('profile.show');

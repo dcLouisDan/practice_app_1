@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import NavLink from "@/Components/NavLink.vue";
+import RecommendedUsers from "@/Components/RecommendedUsers.vue";
 import HomeIcon from "vue-material-design-icons/Home.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import AccountIcon from "vue-material-design-icons/Account.vue";
@@ -85,8 +86,11 @@ const profilePicture = computed(() => {
             <main class="flex-1 max-w-screen-sm sm:border-x-2">
                 <slot />
             </main>
-            <section class="hidden lg:block lg:w-64 pt-5 px-3">
+            <section class="hidden lg:block lg:w-72 pt-5 px-3">
                 <Search v-if="!route().current('search')" />
+                <div class="bg-white mt-3 border-2 rounded-lg overflow-hidden">
+                    <RecommendedUsers />
+                </div>
             </section>
         </div>
     </div>

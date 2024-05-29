@@ -111,4 +111,14 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.view');
     }
+
+    public function recommendUsers(Request $request)
+    {
+        $user = User::find(auth()->id());
+
+        $perPage = $request->input('per_page', 5);
+        $unfollowedUsers = $user->unfollowedUsers($perPage);
+        // dd($unfollowedUsers);
+        return response()->json($unfollowedUsers, 201);
+    }
 }

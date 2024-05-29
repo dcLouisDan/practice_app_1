@@ -3,9 +3,11 @@ import { ref, onMounted, watch } from "vue";
 const props = defineProps({
     placeholder: String,
 });
-const content = ref("");
+const content = defineModel({
+    type: String,
+    required: true,
+});
 const textarea = ref(null);
-console.log(textarea.value);
 const adjustHeight = () => {
     if (textarea.value) {
         textarea.value.style.height = "auto";
