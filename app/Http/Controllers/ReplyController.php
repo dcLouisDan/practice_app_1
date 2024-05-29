@@ -42,7 +42,7 @@ class ReplyController extends Controller
 
         $chirp->replies()->save($reply);
 
-        return response()->json($chirp->refresh(), 201);
+        return response()->json($chirp->refresh()->load(['user', 'likes', 'replies']), 201);
     }
 
     /**

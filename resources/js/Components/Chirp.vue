@@ -8,14 +8,26 @@ import PrimaryButton from "./PrimaryButton.vue";
 import { Link } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
+import Modal from "./Modal.vue";
+import axios from "axios";
 
 dayjs.extend(relativeTime);
 const page = usePage();
 const user = page.props.auth.user;
-const props = defineProps(["chirp", "isLiked"]);
+const props = defineProps({
+    chirp: Object,
+    isModal: {
+        type: Boolean,
+        default: false,
+    },
+});
 const chirpData = ref(props.chirp);
 const form = useForm({
     message: chirpData.value.message,
+});
+
+const replyForm = useForm({
+    message: "",
 });
 const isLiked = computed(() => {
     return chirpData.value.likes.some((like) => like.user_id === user.id);
@@ -28,6 +40,17 @@ const likeChirp = async () => {
         .post(route("chirps.like", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
+        });
+};
+const postReply = async () => {
+    await axios
+        .post(route("replies.store", chirpData.value.id), {
+            message: replyForm.message,
+        })
+        .then((response) => {
+            chirpData.value = response.data;
+            isReplyModalShow.value = false;
+            replyForm.reset();
         });
 };
 const unlikeChirp = async () => {
@@ -45,13 +68,14 @@ const profilePicture = computed(() => {
 });
 
 console.log(props.chirp.user);
-
+const iconSize = "18px";
 const editing = ref(false);
+const isReplyModalShow = ref(false);
 </script>
 
 <template>
     <div class="flex flex-col relative">
-        <div class="p-6 flex space-x-4 z-10 pointer-events-none">
+        <div class="px-6 py-3 flex space-x-4 z-10 pointer-events-none">
             <Link
                 :href="route(`profile.show`, chirpData.user.id)"
                 class="pointer-events-auto"
@@ -59,21 +83,25 @@ const editing = ref(false);
                 <img
                     :src="profilePicture"
                     alt="Profile Picture"
-                    class="rounded-full border-2 border-gray-500 h-12 w-12 object-cover"
+                    class="rounded-full h-10 w-10 object-cover"
                 />
             </Link>
 
             <div class="flex-1">
                 <div class="flex justify-between items-center">
-                    <div>
+                    <div class="flex gap-1 items-center">
                         <Link
                             :href="route(`profile.show`, chirpData.user.id)"
-                            class="text-gray-800 pointer-events-auto"
+                            class="text-gray-800 pointer-events-auto font-bold"
                             >{{ chirpData.user.name }}</Link
                         >
-                        <small class="ml-2 text-sm text-gray-600">{{
-                            dayjs(chirpData.created_at).fromNow()
-                        }}</small>
+                        <p class="text-gray-500">
+                            @{{ chirpData.user.username }}
+                        </p>
+                        <small class="text-sm text-gray-600"
+                            >&bull;
+                            {{ dayjs(chirpData.created_at).fromNow() }}</small
+                        >
                         <small
                             v-if="chirpData.created_at !== chirpData.updated_at"
                             class="text-sm text-gray-600"
@@ -141,32 +169,47 @@ const editing = ref(false);
                         </button>
                     </div>
                 </form>
-                <p v-else class="mt-4 text-lg text-gray-900">
+                <p v-else class="text-lg text-gray-900">
                     {{ chirpData.message }}
                 </p>
             </div>
         </div>
-        <div class="py-2 px-8 flex z-10 justify-around">
-            <div class="flex gap-2">
-                <button class="text-gray-500">
-                    <span class="material-icons">comment</span>
+        <div class="pt-1 pb-2 px-8 flex z-10 justify-around" v-if="!isModal">
+            <div class="flex gap-3">
+                <button
+                    @click="isReplyModalShow = true"
+                    class="text-gray-500 flex items-center"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSize}`"
+                        >comment</span
+                    >
                 </button>
                 <div>{{ replyCount }}</div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-3">
                 <button
-                    class="text-gray-500 active:animate-likeBounce"
+                    class="text-gray-500 active:animate-likeBounce flex items-center"
                     v-if="isLiked"
                     @click="unlikeChirp"
                 >
-                    <span class="material-icons">favorite</span>
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSize}`"
+                        >favorite</span
+                    >
                 </button>
                 <button
-                    class="text-gray-500 active:animate-likeBounce"
+                    class="text-gray-500 active:animate-likeBounce flex items-center"
                     v-else
                     @click="likeChirp"
                 >
-                    <span class="material-icons">favorite_border</span>
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSize}`"
+                        >favorite_border</span
+                    >
                 </button>
                 <div>{{ likeCount }}</div>
             </div>
@@ -176,5 +219,50 @@ const editing = ref(false);
             v-if="!route().current('chirp.show', chirpData.id)"
             class="absolute h-full w-full"
         ></Link>
+        <Modal
+            :show="isReplyModalShow"
+            :closeable="true"
+            @close="isReplyModalShow = false"
+        >
+            <div class="flex border-b-2 py-1 px-3">
+                <button
+                    class="flex items-center p-1 rounded-full hover:bg-gray-100"
+                    @click="isReplyModalShow = false"
+                >
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <Chirp :chirp="chirpData" :isModal="true" />
+            <div class="border-s-2 ps-5 ms-10 py-1">
+                <span class="text-gray-500">Replying to </span>
+                <span class="text-gray-600"
+                    >@{{ chirpData.user.username }}</span
+                >
+            </div>
+
+            <div class="flex px-6 mt-4">
+                <img
+                    :src="page.props.auth.user.profile_picture_url"
+                    alt="Profile Picture"
+                    class="rounded-full h-10 w-10 object-cover"
+                />
+                <div class="w-full">
+                    <textarea
+                        v-model="replyForm.message"
+                        class="w-full text-gray-900 border-none resize-none focus:ring-0"
+                        placeholder="Write a reply..."
+                    ></textarea>
+                    <InputError
+                        :message="replyForm.errors.message"
+                        class="mt-2"
+                    />
+                </div>
+            </div>
+            <div class="py-2 px-4 flex">
+                <PrimaryButton class="ms-auto" @click="postReply">
+                    Reply
+                </PrimaryButton>
+            </div>
+        </Modal>
     </div>
 </template>

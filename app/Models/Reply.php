@@ -11,6 +11,8 @@ class Reply extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['user_id', 'chirp_id', 'parent_id', 'message'];
+
     public function chirp(): BelongsTo
     {
         return $this->belongsTo(Chirp::class);
