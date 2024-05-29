@@ -26,7 +26,7 @@ const postReply = async () => {
             replyForm.reset();
         });
 };
-// console.log(chirpData.value);
+console.log(chirpData.value);
 function updateChirpData(newValue) {
     chirpData.value = newValue;
 }
@@ -36,16 +36,11 @@ function updateChirpData(newValue) {
     <Head title="Post" />
     <AuthenticatedLayout>
         <MainHeader :canBack="true" title="Post" />
-        <div class="relative">
-            <Chirp v-if="chirpData.parent" :chirp="chirpData.parent" />
-            <div
-                class="h-1/2 border-l-2 top-[60px] border-gray-300 absolute left-[43px]"
-            ></div>
-        </div>
         <Chirp
             class="border-b-2"
             :chirp="chirp"
             :main-chirp="true"
+            context="post"
             @update-chirp-data="updateChirpData"
         />
         <div class="border-b-2">
@@ -78,6 +73,7 @@ function updateChirpData(newValue) {
                 v-for="reply in chirpData.replies"
                 :chirp="reply"
                 :key="reply.id"
+                context="reply"
             />
         </div>
     </AuthenticatedLayout>

@@ -93,7 +93,7 @@ class ChirpController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Chirp $chirp): RedirectResponse
+    public function update(Request $request, Chirp $chirp)
     {
         Gate::authorize('update', $chirp);
 
@@ -102,6 +102,12 @@ class ChirpController extends Controller
         ]);
 
         $chirp->update($validated);
+        $context = $request->content;
+
+        // dd($context);
+        if ($context === 'reply' || $context === 'post') {
+            return Inertia::location(route('chirp.show', $chirp->id));
+        }
 
         return redirect(route('dashboard'));
     }
@@ -109,11 +115,15 @@ class ChirpController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chirp $chirp): RedirectResponse
+    public function destroy(Request $request, Chirp $chirp)
     {
         Gate::authorize('delete', $chirp);
-
+        $parent = $chirp->parent_id;
         $chirp->delete();
+        $context = $request->query('context');
+        if ($context === 'reply') {
+            return Inertia::location(route('chirp.show', $parent));
+        }
 
         return redirect(route('dashboard'));
     }

@@ -25,7 +25,7 @@ class ProfileController extends Controller
         $followers = $user->followers;
         $following = $user->following;
         return Inertia::render('Profile/View', [
-            'chirps' => Chirp::where('user_id', auth()->id())->with('user')->with('likes')->with('replies')->latest()->get(),
+            'chirps' => Chirp::where('user_id', auth()->id())->with('user')->with('likes')->with('replies')->with('parent')->latest()->get(),
             'followers' => $followers,
             'following' => $following,
         ]);
@@ -38,7 +38,7 @@ class ProfileController extends Controller
         }
         return Inertia::render('Profile/Show', [
             'user' => $user->load('followers', 'following'),
-            'chirps' => Chirp::where('user_id', $user->id)->with('user')->with('likes')->with('replies')->latest()->get()
+            'chirps' => Chirp::where('user_id', $user->id)->with('user')->with('likes')->with('replies')->with('parent')->latest()->get()
         ]);
     }
     /**

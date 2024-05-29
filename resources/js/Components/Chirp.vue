@@ -23,10 +23,15 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    context: {
+        type: String,
+        default: "dashboard",
+    },
 });
 const chirpData = ref(props.chirp);
 const form = useForm({
     message: chirpData.value.message,
+    content: props.context,
 });
 
 const isLiked = computed(() => {
@@ -83,7 +88,7 @@ function truncate(value, length) {
     }
 }
 
-// console.log(chirpData.value);
+console.log(props.context);
 const iconSize = "18px";
 const iconSizeLg = "24px";
 const editing = ref(false);
@@ -97,6 +102,18 @@ const chirpClass = computed(() => {
 
 <template>
     <div class="flex flex-col">
+        <div class="relative">
+            <Chirp
+                v-if="
+                    chirpData.parent &&
+                    !route().current('chirp.show', chirpData.parent.id)
+                "
+                :chirp="chirpData.parent"
+            />
+            <div
+                class="h-1/2 border-l-2 top-[60px] border-gray-300 absolute left-[43px]"
+            ></div>
+        </div>
         <div class="px-6 py-3 flex relative gap-3">
             <Link
                 :href="route(`profile.show`, chirpData.user.id)"
@@ -109,7 +126,7 @@ const chirpClass = computed(() => {
                 />
             </Link>
 
-            <div class="flex-1 pointer-events-none">
+            <div class="flex-1 pointer-events-none z-10">
                 <div class="flex justify-between items-center">
                     <div :class="chirpClass">
                         <Link
@@ -130,7 +147,10 @@ const chirpClass = computed(() => {
                             {{ dayjs(chirpData.created_at).fromNow() }}</small
                         >
                         <small
-                            v-if="chirpData.created_at !== chirpData.updated_at"
+                            v-if="
+                                chirpData.created_at !== chirpData.updated_at &&
+                                !mainChirp
+                            "
                             class="text-sm text-gray-600"
                             >&middot; edited</small
                         >
@@ -162,7 +182,14 @@ const chirpClass = computed(() => {
                             </button>
                             <DropdownLink
                                 as="button"
-                                :href="route('chirps.destroy', chirpData.id)"
+                                :href="
+                                    route('chirps.destroy', {
+                                        chirp: chirpData.id,
+                                        _query: {
+                                            context: context,
+                                        },
+                                    })
+                                "
                                 method="delete"
                             >
                                 Delete
@@ -171,22 +198,20 @@ const chirpClass = computed(() => {
                     </Dropdown>
                 </div>
                 <form
-                    v-if="editing"
+                    v-if="editing && !mainChirp"
                     @submit.prevent="
                         form.put(route('chirps.update', chirpData.id), {
                             onSuccess: () => (editing = false),
                         })
                     "
+                    class="z-20"
                 >
                     <textarea
                         v-model="form.message"
-                        class="z-10 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                        class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                     ></textarea>
-                    <InputError
-                        :message="form.errors.message"
-                        class="z-10 mt-2"
-                    />
-                    <div class="z-10 space-x-2">
+                    <InputError :message="form.errors.message" class="mt-2" />
+                    <div class="z-20 space-x-2 pointer-events-auto">
                         <PrimaryButton class="z-10 mt-4">Save</PrimaryButton>
                         <button
                             class="mt-4"
@@ -210,19 +235,52 @@ const chirpClass = computed(() => {
             <Link
                 :href="route('chirp.show', chirpData.id)"
                 v-if="!route().current('chirp.show', chirpData.id)"
-                class="absolute h-full w-full top-0 left-0"
+                class="absolute h-full w-full top-0 left-0 z-0"
             ></Link>
         </div>
         <div v-if="mainChirp" class="text-xl px-6 pb-4">
-            {{ chirpData.message }}
+            <form
+                v-if="editing && mainChirp"
+                @submit.prevent="
+                    form.put(route('chirps.update', chirpData.id), {
+                        onSuccess: () => (editing = false),
+                    })
+                "
+                class="z-20"
+            >
+                <textarea
+                    v-model="form.message"
+                    class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                ></textarea>
+                <InputError :message="form.errors.message" class="mt-2" />
+                <div class="z-20 space-x-4 pointer-events-auto">
+                    <PrimaryButton class="z-10 mt-4">Save</PrimaryButton>
+                    <button
+                        class="mt-4 text-base text-gray-600"
+                        @click="
+                            editing = false;
+                            form.reset();
+                            form.clearErrors();
+                        "
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </form>
+            <div v-else>{{ chirpData.message }}</div>
         </div>
-        <div class="ps-6 pb-3" v-if="mainChirp">
+        <div class="ps-6 pb-3 space-x-1" v-if="mainChirp">
             <small class="text-sm text-gray-600">
                 {{ dayjs(chirpData.created_at) }}</small
             >
+            <small
+                v-if="chirpData.created_at !== chirpData.updated_at"
+                class="text-sm text-gray-600"
+                >&bull; edited</small
+            >
         </div>
         <div
-            class="pt-1 pb-1 px-8 flex z-10 justify-around"
+            class="pt-1 pb-1 px-8 flex z-0 justify-around"
             v-if="!isModal && !mainChirp"
         >
             <div class="flex gap-3">
