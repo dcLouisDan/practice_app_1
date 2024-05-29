@@ -5,9 +5,8 @@ import InputError from "./InputError.vue";
 import DropdownLink from "./DropdownLink.vue";
 import Dropdown from "./Dropdown.vue";
 import PrimaryButton from "./PrimaryButton.vue";
-import { Link } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { onMounted, computed, ref } from "vue";
+import { Link, useForm, usePage, router } from "@inertiajs/vue3";
 import Modal from "./Modal.vue";
 import axios from "axios";
 
@@ -17,6 +16,10 @@ const user = page.props.auth.user;
 const props = defineProps({
     chirp: Object,
     isModal: {
+        type: Boolean,
+        default: false,
+    },
+    mainChirp: {
         type: Boolean,
         default: false,
     },
@@ -38,18 +41,22 @@ const likeChirp = async () => {
             chirpData.value = response.data;
         });
 };
+const emit = defineEmits(["updateChirpData"]);
 const replyForm = useForm({
     message: "",
     parent_id: chirpData.value.id,
 });
 const postReply = async () => {
-    console.log(replyForm);
+    // console.log(replyForm);
     await axios
         .post(route("chirp.reply", chirpData.value.id), {
             message: replyForm.message,
             parent_id: replyForm.parent_id,
         })
         .then((response) => {
+            if (route().current("chirp.show", chirpData.value.parent_id)) {
+                emit("updateChirpData", response.data);
+            }
             chirpData.value = response.data;
             isReplyModalShow.value = false;
             replyForm.reset();
@@ -68,11 +75,24 @@ const profilePicture = computed(() => {
         "images/profile_placeholder.png"
     );
 });
+function truncate(value, length) {
+    if (value.length > length) {
+        return value.substring(0, length) + "...";
+    } else {
+        return value;
+    }
+}
 
-console.log(chirpData.value);
+// console.log(chirpData.value);
 const iconSize = "18px";
+const iconSizeLg = "24px";
 const editing = ref(false);
 const isReplyModalShow = ref(false);
+const chirpClass = computed(() => {
+    return props.mainChirp
+        ? "flex flex-col z-10"
+        : "flex flex-row gap-1 items-center z-10";
+});
 </script>
 
 <template>
@@ -91,16 +111,21 @@ const isReplyModalShow = ref(false);
 
             <div class="flex-1 pointer-events-none">
                 <div class="flex justify-between items-center">
-                    <div class="flex gap-1 items-center z-10">
+                    <div :class="chirpClass">
                         <Link
                             :href="route(`profile.show`, chirpData.user.id)"
-                            class="text-gray-800 pointer-events-auto font-bold"
-                            >{{ chirpData.user.name }}</Link
+                            class="text-gray-800 pointer-events-auto font-bold hidden md:block"
+                            >{{ truncate(chirpData.user.name, 20) }}</Link
+                        >
+                        <Link
+                            :href="route(`profile.show`, chirpData.user.id)"
+                            class="text-gray-800 pointer-events-auto font-bold block md:hidden"
+                            >{{ truncate(chirpData.user.name, 8) }}</Link
                         >
                         <p class="text-gray-500">
-                            @{{ chirpData.user.username }}
+                            @{{ truncate(chirpData.user.username, 8) }}
                         </p>
-                        <small class="text-sm text-gray-600"
+                        <small class="text-sm text-gray-600" v-if="!mainChirp"
                             >&bull;
                             {{ dayjs(chirpData.created_at).fromNow() }}</small
                         >
@@ -175,7 +200,10 @@ const isReplyModalShow = ref(false);
                         </button>
                     </div>
                 </form>
-                <p v-else class="z-10 text-lg text-gray-900">
+                <p
+                    v-else-if="!editing && !mainChirp"
+                    class="z-10 text-lg text-gray-900"
+                >
                     {{ chirpData.message }}
                 </p>
             </div>
@@ -185,7 +213,18 @@ const isReplyModalShow = ref(false);
                 class="absolute h-full w-full top-0 left-0"
             ></Link>
         </div>
-        <div class="pt-1 pb-2 px-8 flex z-10 justify-around" v-if="!isModal">
+        <div v-if="mainChirp" class="text-xl px-6 pb-4">
+            {{ chirpData.message }}
+        </div>
+        <div class="ps-6 pb-3" v-if="mainChirp">
+            <small class="text-sm text-gray-600">
+                {{ dayjs(chirpData.created_at) }}</small
+            >
+        </div>
+        <div
+            class="pt-1 pb-1 px-8 flex z-10 justify-around"
+            v-if="!isModal && !mainChirp"
+        >
             <div class="flex gap-3">
                 <button
                     @click="isReplyModalShow = true"
@@ -219,6 +258,49 @@ const isReplyModalShow = ref(false);
                     <span
                         class="material-icons"
                         :style="`font-size: ${iconSize}`"
+                        >favorite_border</span
+                    >
+                </button>
+                <div>{{ likeCount }}</div>
+            </div>
+        </div>
+        <div
+            class="py-2 px-8 flex z-10 justify-around border-t-2"
+            v-if="!isModal && mainChirp"
+        >
+            <div class="flex gap-3">
+                <button
+                    @click="isReplyModalShow = true"
+                    class="text-gray-500 flex items-center"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSizeLg}`"
+                        >comment</span
+                    >
+                </button>
+                <div>{{ replyCount }}</div>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="text-gray-500 active:animate-likeBounce flex items-center"
+                    v-if="isLiked"
+                    @click="unlikeChirp"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSizeLg}`"
+                        >favorite</span
+                    >
+                </button>
+                <button
+                    class="text-gray-500 active:animate-likeBounce flex items-center"
+                    v-else
+                    @click="likeChirp"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSizeLg}`"
                         >favorite_border</span
                     >
                 </button>

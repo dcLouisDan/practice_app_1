@@ -2,9 +2,11 @@
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import AutoResizeTextarea from "@/Components/AutoResizeTextarea.vue";
 import Chirp from "@/Components/Chirp.vue";
-import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { Link, Head, useForm, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
+import MainHeader from "@/Components/MainHeader.vue";
 
 const props = defineProps(["chirps"]);
 const page = usePage();
@@ -18,23 +20,33 @@ const form = useForm({
     <Head title="Home" />
 
     <AuthenticatedLayout>
-        <div class="py-5">
-            <div class="mx-auto px-4 pb-4 sm:p-6 lg:p-8 border-b-2">
+        <MainHeader :can-back="false" title="Home" />
+        <div class="">
+            <div
+                class="mx-auto px-4 pb-4 sm:p-4 sm:flex border-b-2 gap-2 pt-4 hidden"
+            >
+                <Link :href="route('profile.view')" as="button" class="mb-auto">
+                    <img
+                        :src="user.profile_picture_url"
+                        alt="Profile Picture"
+                        class="rounded-full h-14 w-14 object-cover"
+                    />
+                </Link>
                 <form
                     @submit.prevent="
                         form.post(route('chirps.store'), {
                             onSuccess: () => form.reset(),
                         })
                     "
-                    class="flex flex-col"
+                    class="flex flex-col flex-1"
                 >
-                    <textarea
+                    <AutoResizeTextarea
                         v-model="form.message"
-                        placeholder="What's on your mind"
-                        class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
-                    ></textarea>
+                        placeholder="What's on your mind?"
+                        class="block w-full focus:ring-0 border-none max-h-36"
+                    ></AutoResizeTextarea>
                     <InputError :message="form.errors.message" class="mt-2" />
-                    <PrimaryButton class="mt-4 ms-auto">Chirp</PrimaryButton>
+                    <PrimaryButton class="mt-2 ms-auto">Chirp</PrimaryButton>
                 </form>
             </div>
             <div class="divide-y border-b-2">

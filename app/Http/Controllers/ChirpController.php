@@ -45,7 +45,7 @@ class ChirpController extends Controller
         ]);
 
         $request->user()->chirps()->create($validated);
-        $chirp->refresh()->load(['likes', 'user', 'replies']);
+        $chirp->refresh()->load(['likes', 'user', 'replies', 'parent']);
         return response()->json($chirp, 201);
     }
 
@@ -78,7 +78,7 @@ class ChirpController extends Controller
     public function show(Chirp $chirp)
     {
         return Inertia::render('ChirpPage', [
-            'chirp' => $chirp->load(['user', 'replies', 'likes'])
+            'chirp' => $chirp->load(['user', 'replies', 'likes', 'parent'])
         ]);
     }
 

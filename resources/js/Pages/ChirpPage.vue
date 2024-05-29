@@ -2,8 +2,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Chirp from "@/Components/Chirp.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { useForm, usePage } from "@inertiajs/vue3";
-import { ref } from "vue";
+import MainHeader from "@/Components/MainHeader.vue";
+import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { computed, onMounted, ref, watch } from "vue";
 import InputError from "@/Components/InputError.vue";
 const props = defineProps({
     chirp: Object,
@@ -16,23 +17,37 @@ const replyForm = useForm({
 });
 const postReply = async () => {
     await axios
-        .post(route("replies.store", chirpData.value.id), {
+        .post(route("chirp.reply", chirpData.value.id), {
             message: replyForm.message,
+            parent_id: chirpData.value.id,
         })
         .then((response) => {
             chirpData.value = response.data;
             replyForm.reset();
         });
 };
-
 // console.log(chirpData.value);
+function updateChirpData(newValue) {
+    chirpData.value = newValue;
+}
 </script>
 
 <template>
+    <Head title="Post" />
     <AuthenticatedLayout>
-        <div class="pt-10">
-            <Chirp class="border-b-2 border-t-2" :chirp="chirp" />
+        <MainHeader :canBack="true" title="Post" />
+        <div class="relative">
+            <Chirp v-if="chirpData.parent" :chirp="chirpData.parent" />
+            <div
+                class="h-1/2 border-l-2 top-[60px] border-gray-300 absolute left-[43px]"
+            ></div>
         </div>
+        <Chirp
+            class="border-b-2"
+            :chirp="chirp"
+            :main-chirp="true"
+            @update-chirp-data="updateChirpData"
+        />
         <div class="border-b-2">
             <div class="flex px-6 mt-4">
                 <img
