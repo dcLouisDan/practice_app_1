@@ -12,7 +12,8 @@ class Chirp extends Model
     use HasFactory;
 
     protected $fillable = [
-        'message'
+        'message',
+        'parent_id'
     ];
 
     public function user(): BelongsTo
@@ -27,6 +28,11 @@ class Chirp extends Model
 
     public function replies(): HasMany
     {
-        return $this->hasMany(Reply::class);
+        return $this->hasMany(Chirp::class, 'parent_id')->with('user', 'likes', 'replies');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Chirp::class, 'parent_id');
     }
 }

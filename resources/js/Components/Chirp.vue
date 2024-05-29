@@ -26,15 +26,11 @@ const form = useForm({
     message: chirpData.value.message,
 });
 
-const replyForm = useForm({
-    message: "",
-});
 const isLiked = computed(() => {
     return chirpData.value.likes.some((like) => like.user_id === user.id);
 });
 const likeCount = computed(() => chirpData.value.likes.length);
 const replyCount = computed(() => chirpData.value.replies.length);
-console.log(props.chirp.context);
 const likeChirp = async () => {
     await axios
         .post(route("chirps.like", chirpData.value.id))
@@ -42,10 +38,16 @@ const likeChirp = async () => {
             chirpData.value = response.data;
         });
 };
+const replyForm = useForm({
+    message: "",
+    parent_id: chirpData.value.id,
+});
 const postReply = async () => {
+    console.log(replyForm);
     await axios
-        .post(route("replies.store", chirpData.value.id), {
+        .post(route("chirp.reply", chirpData.value.id), {
             message: replyForm.message,
+            parent_id: replyForm.parent_id,
         })
         .then((response) => {
             chirpData.value = response.data;
@@ -67,18 +69,18 @@ const profilePicture = computed(() => {
     );
 });
 
-console.log(props.chirp.user);
+console.log(chirpData.value);
 const iconSize = "18px";
 const editing = ref(false);
 const isReplyModalShow = ref(false);
 </script>
 
 <template>
-    <div class="flex flex-col relative">
-        <div class="px-6 py-3 flex space-x-4 z-10 pointer-events-none">
+    <div class="flex flex-col">
+        <div class="px-6 py-3 flex relative gap-3">
             <Link
                 :href="route(`profile.show`, chirpData.user.id)"
-                class="pointer-events-auto"
+                class="pointer-events-auto z-10"
             >
                 <img
                     :src="profilePicture"
@@ -87,9 +89,9 @@ const isReplyModalShow = ref(false);
                 />
             </Link>
 
-            <div class="flex-1">
+            <div class="flex-1 pointer-events-none">
                 <div class="flex justify-between items-center">
-                    <div class="flex gap-1 items-center">
+                    <div class="flex gap-1 items-center z-10">
                         <Link
                             :href="route(`profile.show`, chirpData.user.id)"
                             class="text-gray-800 pointer-events-auto font-bold"
@@ -110,9 +112,10 @@ const isReplyModalShow = ref(false);
                     </div>
                     <Dropdown
                         v-if="chirpData.user.id === $page.props.auth.user.id"
+                        class="z-50 pointer-events-auto"
                     >
                         <template #trigger>
-                            <button>
+                            <button class="pointer-events-auto">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     class="h-4 w-4 text-gray-400"
@@ -152,11 +155,14 @@ const isReplyModalShow = ref(false);
                 >
                     <textarea
                         v-model="form.message"
-                        class="mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                        class="z-10 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                     ></textarea>
-                    <InputError :message="form.errors.message" class="mt-2" />
-                    <div class="space-x-2">
-                        <PrimaryButton class="mt-4">Save</PrimaryButton>
+                    <InputError
+                        :message="form.errors.message"
+                        class="z-10 mt-2"
+                    />
+                    <div class="z-10 space-x-2">
+                        <PrimaryButton class="z-10 mt-4">Save</PrimaryButton>
                         <button
                             class="mt-4"
                             @click="
@@ -169,10 +175,15 @@ const isReplyModalShow = ref(false);
                         </button>
                     </div>
                 </form>
-                <p v-else class="text-lg text-gray-900">
+                <p v-else class="z-10 text-lg text-gray-900">
                     {{ chirpData.message }}
                 </p>
             </div>
+            <Link
+                :href="route('chirp.show', chirpData.id)"
+                v-if="!route().current('chirp.show', chirpData.id)"
+                class="absolute h-full w-full top-0 left-0"
+            ></Link>
         </div>
         <div class="pt-1 pb-2 px-8 flex z-10 justify-around" v-if="!isModal">
             <div class="flex gap-3">
@@ -214,11 +225,7 @@ const isReplyModalShow = ref(false);
                 <div>{{ likeCount }}</div>
             </div>
         </div>
-        <Link
-            :href="route('chirp.show', chirpData.id)"
-            v-if="!route().current('chirp.show', chirpData.id)"
-            class="absolute h-full w-full"
-        ></Link>
+
         <Modal
             :show="isReplyModalShow"
             :closeable="true"

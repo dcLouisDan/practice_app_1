@@ -34,8 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/chirps/{chirp}/unlike', [LikeController::class, 'destroy'])->name('chirps.unlike');
     Route::post('account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::delete('account/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
-    Route::post('chirp/{chirp}/replies', [ReplyController::class, 'store'])->name('replies.store');
     Route::get('chirp/{chirp}', [ChirpController::class, 'show'])->name('chirp.show');
+    Route::post('chirp/{chirp}/reply', [ChirpController::class, 'reply'])->name('chirp.reply');
 });
 
 

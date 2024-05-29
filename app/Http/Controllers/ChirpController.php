@@ -18,7 +18,7 @@ class ChirpController extends Controller
     {
         $authUserId = auth()->id();
 
-        $ownChirps = Chirp::where('user_id', $authUserId)->with('user')->with('likes')->with('replies')->latest()->get()->toArray();
+        $ownChirps = Chirp::whereNull('parent_id')->where('user_id', $authUserId)->with('user')->with('likes')->with('replies')->latest()->get()->toArray();
 
         $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
             $query->select('following_id')
@@ -37,6 +37,18 @@ class ChirpController extends Controller
         ]);
     }
 
+    public function reply(Request $request, Chirp $chirp)
+    {
+        $validated = $request->validate([
+            'message' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:chirps,id'
+        ]);
+
+        $request->user()->chirps()->create($validated);
+        $chirp->refresh()->load(['likes', 'user', 'replies']);
+        return response()->json($chirp, 201);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -51,7 +63,8 @@ class ChirpController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'message' => 'required|string|max:255'
+            'message' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:chirps,id'
         ]);
 
         $request->user()->chirps()->create($validated);
