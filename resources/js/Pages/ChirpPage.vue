@@ -4,12 +4,11 @@ import Chirp from "@/Components/Chirp.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import MainHeader from "@/Components/MainHeader.vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import InputError from "@/Components/InputError.vue";
-const props = defineProps({
-    chirp: Object,
-});
 
+const props = defineProps(["chirp"]);
+console.log(props.chirp);
 const chirpData = ref(props.chirp);
 const page = usePage();
 const replyForm = useForm({
@@ -26,10 +25,17 @@ const postReply = async () => {
             replyForm.reset();
         });
 };
-console.log(chirpData.value);
+// console.log(chirpData.value);
 function updateChirpData(newValue) {
     chirpData.value = newValue;
 }
+
+onMounted(() => {
+    axios.get(route("chirp.show.data", props.chirp.id)).then((response) => {
+        chirpData.value = response.data;
+        console.log(response.data);
+    });
+});
 </script>
 
 <template>
@@ -38,7 +44,7 @@ function updateChirpData(newValue) {
         <MainHeader :canBack="true" title="Post" />
         <Chirp
             class="border-b-2"
-            :chirp="chirp"
+            :chirp="chirpData"
             :main-chirp="true"
             context="post"
             @update-chirp-data="updateChirpData"

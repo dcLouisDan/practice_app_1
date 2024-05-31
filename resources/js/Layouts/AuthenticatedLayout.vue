@@ -26,7 +26,7 @@ const profilePicture = computed(() => {
                 <ApplicationLogo style="height: 50px" />
             </header>
             <nav
-                class="sm:p-3 border-t-2 sm:border-t-0 sm:w-fit lg:w-64 border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:min-h-screen sm:max-h-screen w-full"
+                class="sm:p-3 border-t-2 sm:border-t-0 sm:w-fit lg:w-64 border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:top-0 sm:min-h-screen sm:max-h-screen w-full"
             >
                 <ApplicationLogo style="height: 50px" class="hidden sm:block" />
                 <div
@@ -85,11 +85,16 @@ const profilePicture = computed(() => {
             <!-- Page Content -->
             <main class="flex-1 max-w-screen-sm sm:border-x-2">
                 <slot />
+                <div class="w-full h-12"></div>
             </main>
-            <section class="hidden lg:block lg:w-72 pt-5 px-3">
-                <Search v-if="!route().current('search')" />
-                <div class="bg-white mt-3 border-2 rounded-lg overflow-hidden">
-                    <RecommendedUsers />
+            <section class="hidden lg:block lg:w-72">
+                <div class="pt-5 px-3 sm:sticky sm:top-0">
+                    <Search v-if="!route().current('search')" />
+                    <div
+                        class="bg-white mt-3 border-2 rounded-lg overflow-hidden"
+                    >
+                        <RecommendedUsers />
+                    </div>
                 </div>
             </section>
         </div>

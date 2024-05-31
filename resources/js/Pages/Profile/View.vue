@@ -3,17 +3,25 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Chirp from "@/Components/Chirp.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import RoundedPrimaryButton from "@/Components/RoundedPrimaryButton.vue";
 import axios from "axios";
 import DropdownLink from "@/Components/DropdownLink.vue";
 
-const props = defineProps(["chirps", "followers", "following"]);
+const props = defineProps(["followers", "following"]);
 const page = usePage();
 const user = page.props.auth.user;
+const chirps = ref([]);
 
 const profilePicture = computed(() => {
     return user.profile_picture_url || "images/profile_placeholder.png";
+});
+
+onMounted(() => {
+    axios.get(route("chirps.showMine")).then((response) => {
+        chirps.value = response.data;
+        console.log(response.data);
+    });
 });
 </script>
 

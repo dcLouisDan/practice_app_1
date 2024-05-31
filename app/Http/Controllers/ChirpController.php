@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chirp;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Response;
 use Inertia\Inertia;
@@ -14,11 +16,11 @@ class ChirpController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(): JsonResponse
     {
         $authUserId = auth()->id();
 
-        $ownChirps = Chirp::whereNull('parent_id')->where('user_id', $authUserId)->with('user')->with('likes')->with('replies')->with('parent')->latest()->get()->toArray();
+        $ownChirps = Chirp::where('user_id', $authUserId)->with('user')->with('likes')->with('replies')->with('parent')->latest()->get()->toArray();
 
         $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
             $query->select('following_id')
@@ -32,9 +34,7 @@ class ChirpController extends Controller
         });
 
 
-        return Inertia::render('Dashboard', [
-            'chirps' => $chirps
-        ]);
+        return response()->json($chirps, 201);
     }
 
     public function reply(Request $request, Chirp $chirp)
@@ -77,9 +77,23 @@ class ChirpController extends Controller
      */
     public function show(Chirp $chirp)
     {
-        return Inertia::render('ChirpPage', [
-            'chirp' => $chirp->load(['user', 'replies', 'likes', 'parent'])
-        ]);
+        $chirp = $chirp->load(['user', 'replies', 'likes', 'parent']);
+
+        return response()->json($chirp, 201);
+    }
+
+    public function showMyChirps(): JsonResponse
+    {
+        $chirps = Chirp::where('user_id', auth()->id())->with('user')->with('likes')->with('replies')->with('parent')->latest()->get();
+
+        return response()->json($chirps, 201);
+    }
+
+    public function showUserChirps(User $user): JsonResponse
+    {
+        $chirps = Chirp::where('user_id', $user->id)->with('user')->with('likes')->with('replies')->with('parent')->latest()->get();
+
+        return response()->json($chirps, 201);
     }
 
     /**

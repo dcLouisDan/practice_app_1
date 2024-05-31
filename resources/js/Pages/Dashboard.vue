@@ -5,14 +5,22 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import AutoResizeTextarea from "@/Components/AutoResizeTextarea.vue";
 import Chirp from "@/Components/Chirp.vue";
 import { Link, Head, useForm, usePage } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { ref, onMounted } from "vue";
 import MainHeader from "@/Components/MainHeader.vue";
+import axios from "axios";
 
-const props = defineProps(["chirps"]);
 const page = usePage();
 const user = page.props.auth.user;
 const form = useForm({
     message: "",
+});
+
+const chirps = ref([]);
+onMounted(() => {
+    axios.get(route("chirps.index")).then((response) => {
+        chirps.value = response.data;
+        console.log(response.data);
+    });
 });
 </script>
 

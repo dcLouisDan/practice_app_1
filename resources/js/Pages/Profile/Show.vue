@@ -4,13 +4,13 @@ import Chirp from "@/Components/Chirp.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { Head, usePage } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-const props = defineProps(["user", "chirps"]);
+const props = defineProps(["user"]);
 const page = usePage();
 const authUser = page.props.auth.user;
 const user = ref(page.props.user);
-
+const chirps = ref([]);
 const isUnfollowBtnHovered = ref(false);
 const unfollowText = computed(() => {
     return isUnfollowBtnHovered.value ? "Unfollow" : "Following";
@@ -32,6 +32,13 @@ const unfollow = async () => {
             user.value = response.data;
         });
 };
+
+onMounted(() => {
+    axios.get(route("profile.chirps.show", user.value.id)).then((response) => {
+        chirps.value = response.data;
+        console.log(response.data);
+    });
+});
 </script>
 
 <template>

@@ -6,6 +6,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SearchController;
+use App\Models\Chirp;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', [ChirpController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/recommend/users', [ProfileController::class, 'recommendUsers'])->name('users.recommend');
 Route::middleware('auth')->group(function () {
@@ -35,8 +38,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/chirps/{chirp}/unlike', [LikeController::class, 'destroy'])->name('chirps.unlike');
     Route::post('account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::delete('account/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
-    Route::get('chirp/{chirp}', [ChirpController::class, 'show'])->name('chirp.show');
+    Route::get('chirp/{chirp}', function (Chirp $chirp) {
+        return Inertia::render('ChirpPage', ['chirp' => $chirp->load(['user', 'likes', 'replies', 'parent'])]);
+    })->name('chirp.show');
+    Route::get('chirp/{chirp}/data', [ChirpController::class, 'show'])->name('chirp.show.data');
     Route::post('chirp/{chirp}/reply', [ChirpController::class, 'reply'])->name('chirp.reply');
+    Route::get('profile/chirps', [ChirpController::class, 'showMyChirps'])->name('chirps.showMine');
+    Route::get('account/{user}/chirps', [ChirpController::class, 'showUserChirps'])->name('profile.chirps.show');
 });
 
 
