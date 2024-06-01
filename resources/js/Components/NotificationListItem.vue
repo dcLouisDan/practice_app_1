@@ -9,23 +9,30 @@ const notificationData = computed(() => {
     return props.notification.data;
 });
 
-console.log(props.notification);
+console.log(notificationData.value.chirp_id);
 
 const wasRead = computed(() => {
     return props.notification.read_at != null;
 });
-const icons = {
+const notif = {
     like: {
         icon: "favorite",
         class: "text-red-600",
+        href: notificationData.value.chirp_id
+            ? route("chirp.show", notificationData.value.chirp_id)
+            : null,
     },
     reply: {
         icon: "comment",
         class: "text-blue-500",
+        href: notificationData.value.chirp_id
+            ? route("chirp.show", notificationData.value.chirp_id)
+            : null,
     },
     follow: {
         icon: "person",
         class: "text-green-500",
+        href: route("profile.show", notificationData.value.user_id),
     },
 };
 
@@ -34,16 +41,17 @@ const bg = computed(() => {
 });
 </script>
 <template>
-    <div :class="`flex px-4 py-3 ${bg}`">
-        <div :class="icons[notificationData.type].class">
+    <div :class="`flex px-4 py-3 ${bg} relative`">
+        <div :class="`${notif[notificationData.type].class} z-10`">
             <span class="material-icons" style="font-size: 2em">{{
-                icons[notificationData.type].icon
+                notif[notificationData.type].icon
             }}</span>
         </div>
-        <div class="flex-1 px-4">
+        <div class="flex-1 px-4 z-10 pointer-events-none">
             <Link
                 :href="route('profile.show', notificationData.user_id)"
                 as="button"
+                class="pointer-events-auto"
             >
                 <img
                     :src="notificationData.user_profile_picture_url"
@@ -56,5 +64,9 @@ const bg = computed(() => {
                 {{ notificationData.content }}
             </div>
         </div>
+        <Link
+            :href="notif[notificationData.type].href"
+            class="h-full w-full absolute top-0 left-0 hover:bg-gray-200 transition-all ease-in"
+        ></Link>
     </div>
 </template>
