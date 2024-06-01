@@ -66,7 +66,7 @@ onMounted(async () => {
                     <AutoResizeTextarea
                         v-model="form.message"
                         placeholder="What's on your mind?"
-                        class="block w-full focus:ring-0 border-none max-h-36"
+                        class="block w-full focus:ring-0 max-h-36"
                     ></AutoResizeTextarea>
                     <InputError :message="form.errors.message" class="mt-2" />
                     <PrimaryButton class="mt-2 ms-auto">Chirp</PrimaryButton>

@@ -109,7 +109,7 @@ console.log(chirpData.value);
 </script>
 
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col hover:bg-gray-50">
         <div class="relative">
             <Chirp
                 v-if="
