@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChirpReplied;
+use App\Events\ReplyDeleted;
 use App\Models\Chirp;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -46,6 +48,10 @@ class ChirpController extends Controller
 
         $request->user()->chirps()->create($validated);
         $chirp->refresh()->load(['likes', 'user', 'replies', 'parent']);
+
+        if ($chirp->user->id !== auth()->id()) {
+            event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
+        }
         return response()->json($chirp, 201);
     }
 
@@ -123,7 +129,7 @@ class ChirpController extends Controller
             return Inertia::location(route('chirp.show', $chirp->id));
         }
 
-        return redirect(route('dashboard'));
+        return Inertia::location(route('dashboard'));;
     }
 
     /**
@@ -137,6 +143,9 @@ class ChirpController extends Controller
         $context = $request->query('context');
         if ($context === 'reply') {
             return Inertia::location(route('chirp.show', $parent));
+        }
+        if ($chirp->user->id !== auth()->id()) {
+            event(new ReplyDeleted($chirp, auth()->user()));
         }
 
         return redirect(route('dashboard'));

@@ -8,7 +8,7 @@ import { onMounted, ref } from "vue";
 import InputError from "@/Components/InputError.vue";
 
 const props = defineProps(["chirp"]);
-console.log(props.chirp);
+// console.log(props.chirp);
 const chirpData = ref(props.chirp);
 const page = usePage();
 const replyForm = useForm({
@@ -33,7 +33,7 @@ function updateChirpData(newValue) {
 onMounted(() => {
     axios.get(route("chirp.show.data", props.chirp.id)).then((response) => {
         chirpData.value = response.data;
-        console.log(response.data);
+        // console.log(response.data);
     });
 });
 </script>

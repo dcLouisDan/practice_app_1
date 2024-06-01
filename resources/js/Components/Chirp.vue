@@ -46,7 +46,7 @@ const likeChirp = async () => {
             chirpData.value = response.data;
         });
 };
-const emit = defineEmits(["updateChirpData"]);
+const emit = defineEmits(["updateChirpData", "refreshData"]);
 const replyForm = useForm({
     message: "",
     parent_id: chirpData.value.id,
@@ -64,6 +64,7 @@ const postReply = async () => {
             }
             chirpData.value = response.data;
             isReplyModalShow.value = false;
+            emit("refreshData", { refresh: true });
             replyForm.reset();
         });
 };
@@ -72,6 +73,7 @@ const unlikeChirp = async () => {
         .delete(route("chirps.unlike", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
+            // console.log(response);
         });
 };
 const profilePicture = computed(() => {
@@ -87,8 +89,12 @@ function truncate(value, length) {
         return value;
     }
 }
+const refreshData = () => {
+    console.log("refresh");
+    emit("refreshData", { refresh: true });
+};
 
-console.log(props.context);
+// console.log(props.context);
 const iconSize = "18px";
 const iconSizeLg = "24px";
 const editing = ref(false);
@@ -109,6 +115,7 @@ const chirpClass = computed(() => {
                     !route().current('chirp.show', chirpData.parent.id)
                 "
                 :chirp="chirpData.parent"
+                @refresh-data="refreshData"
             />
             <div
                 class="h-1/2 border-l-2 top-[60px] border-gray-300 absolute left-[43px]"
@@ -160,7 +167,9 @@ const chirpClass = computed(() => {
                         class="z-50 pointer-events-auto"
                     >
                         <template #trigger>
-                            <button class="pointer-events-auto">
+                            <button
+                                class="pointer-events-auto active:bg-gray-300 hover:bg-gray-200 h-7 w-7 flex items-center justify-center rounded-full transition-all ease-out"
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     class="h-4 w-4 text-gray-400"
@@ -190,6 +199,7 @@ const chirpClass = computed(() => {
                                         },
                                     })
                                 "
+                                @click="refreshData"
                                 method="delete"
                             >
                                 Delete
@@ -201,7 +211,10 @@ const chirpClass = computed(() => {
                     v-if="editing && !mainChirp"
                     @submit.prevent="
                         form.put(route('chirps.update', chirpData.id), {
-                            onSuccess: () => (editing = false),
+                            onSuccess: () => {
+                                editing = false;
+                                refreshData();
+                            },
                         })
                     "
                     class="z-20"

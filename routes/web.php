@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChirpController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SearchController;
@@ -36,15 +37,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'store'])->name('chirps.like');
     Route::delete('/chirps/{chirp}/unlike', [LikeController::class, 'destroy'])->name('chirps.unlike');
-    Route::post('account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
-    Route::delete('account/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
-    Route::get('chirp/{chirp}', function (Chirp $chirp) {
+    Route::post('/account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
+    Route::delete('/account/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
+    Route::get('/chirp/{chirp}', function (Chirp $chirp) {
         return Inertia::render('ChirpPage', ['chirp' => $chirp->load(['user', 'likes', 'replies', 'parent'])]);
     })->name('chirp.show');
-    Route::get('chirp/{chirp}/data', [ChirpController::class, 'show'])->name('chirp.show.data');
-    Route::post('chirp/{chirp}/reply', [ChirpController::class, 'reply'])->name('chirp.reply');
-    Route::get('profile/chirps', [ChirpController::class, 'showMyChirps'])->name('chirps.showMine');
-    Route::get('account/{user}/chirps', [ChirpController::class, 'showUserChirps'])->name('profile.chirps.show');
+    Route::get('/chirp/{chirp}/data', [ChirpController::class, 'show'])->name('chirp.show.data');
+    Route::post('/chirp/{chirp}/reply', [ChirpController::class, 'reply'])->name('chirp.reply');
+    Route::get('/profile/chirps', [ChirpController::class, 'showMyChirps'])->name('chirps.showMine');
+    Route::get('/account/{user}/chirps', [ChirpController::class, 'showUserChirps'])->name('profile.chirps.show');
+    Route::get('/notifications/get', [NotificationController::class, 'index'])->name('notifications.get');
+    Route::get('/notifications/get/unread', [NotificationController::class, 'unread'])->name('notifications.get.unread');
+    Route::get('/notifications', function () {
+        return Inertia::render('Notifications');
+    })->name('notifications.show');
 });
 
 

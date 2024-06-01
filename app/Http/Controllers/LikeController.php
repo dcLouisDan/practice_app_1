@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChirpDisliked;
+use App\Events\ChirpLiked;
 use App\Models\Chirp;
 use App\Models\Like;
+use App\Notifications\ChirpLikedNotification;
 use Illuminate\Http\Request;
 
 class LikeController extends Controller
@@ -43,8 +46,10 @@ class LikeController extends Controller
         ]);
 
         $chirp->refresh();
-
-        return response()->json($chirp->load(['likes', 'user', 'replies']), 201);
+        if ($chirp->user->id !== auth()->id()) {
+            event(new ChirpLiked($chirp, auth()->user()));
+        }
+        return response()->json($chirp->load(['likes', 'user', 'replies', 'parent']), 201);
     }
 
     /**
@@ -76,10 +81,12 @@ class LikeController extends Controller
      */
     public function destroy(Request $request, Chirp $chirp)
     {
+        if ($chirp->user->id !== auth()->id()) {
+            event(new ChirpDisliked($chirp, auth()->user()));
+        }
         $chirp->likes()->where('user_id', auth()->id())->delete();
-
         $chirp->refresh();
 
-        return response()->json($chirp->load(['likes', 'user', 'replies']), 201);
+        return response()->json($chirp->load(['likes', 'user', 'replies', 'parent']), 201);
     }
 }

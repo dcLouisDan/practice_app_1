@@ -14,6 +14,18 @@ const props = defineProps({
         type: [Object, Function],
         required: true,
     },
+    iconSize: {
+        type: Number,
+        default: 36,
+    },
+    haveBadge: {
+        type: Boolean,
+        default: false,
+    },
+    badgeData: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const classes = computed(() =>
@@ -25,7 +37,15 @@ const classes = computed(() =>
 
 <template>
     <Link :href="href" :class="classes">
-        <icon :is="icon" :size="36" />
+        <div class="relative">
+            <div
+                v-if="haveBadge && badgeData > 0"
+                class="absolute bg-red-600 text-white top-0 right-0 text-xs h-4 w-4 p-1 rounded-full flex items-center justify-center"
+            >
+                {{ badgeData }}
+            </div>
+            <icon :is="icon" :size="iconSize" />
+        </div>
         <div class="hidden lg:block">
             <slot />
         </div>

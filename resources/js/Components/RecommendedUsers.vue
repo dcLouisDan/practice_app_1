@@ -13,7 +13,7 @@ const fetchUsers = async () => {
 
 onMounted(() => {
     fetchUsers();
-    console.log(recommendedUsers.value);
+    // console.log(recommendedUsers.value);
 });
 </script>
 

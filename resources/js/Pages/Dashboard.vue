@@ -16,11 +16,23 @@ const form = useForm({
 });
 
 const chirps = ref([]);
-onMounted(() => {
-    axios.get(route("chirps.index")).then((response) => {
-        chirps.value = response.data;
+const fetchChirps = async () => {
+    try {
+        const response = await axios.get(route("chirps.index"));
         console.log(response.data);
-    });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching chirps:", error);
+        return [];
+    }
+};
+
+const refreshData = async () => {
+    chirps.value = await fetchChirps();
+};
+
+onMounted(async () => {
+    chirps.value = await fetchChirps();
 });
 </script>
 
@@ -43,7 +55,10 @@ onMounted(() => {
                 <form
                     @submit.prevent="
                         form.post(route('chirps.store'), {
-                            onSuccess: () => form.reset(),
+                            onSuccess: () => {
+                                form.reset();
+                                refreshData();
+                            },
                         })
                     "
                     class="flex flex-col flex-1"
@@ -67,7 +82,12 @@ onMounted(() => {
                         first to chirp!
                     </p>
                 </div>
-                <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
+                <Chirp
+                    v-for="chirp in chirps"
+                    :key="chirp.id"
+                    :chirp="chirp"
+                    @refresh-data="refreshData"
+                />
             </div>
         </div>
     </AuthenticatedLayout>

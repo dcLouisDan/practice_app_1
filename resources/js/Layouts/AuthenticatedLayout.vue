@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import NavLink from "@/Components/NavLink.vue";
@@ -7,11 +7,24 @@ import RecommendedUsers from "@/Components/RecommendedUsers.vue";
 import HomeIcon from "vue-material-design-icons/Home.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import AccountIcon from "vue-material-design-icons/Account.vue";
+import BellIcon from "vue-material-design-icons/Bell.vue";
 import Search from "@/Components/Search.vue";
+import axios from "axios";
 const page = usePage();
 const user = page.props.auth.user;
+const unreadNotifications = ref([]);
+const unreadNotificationsCount = computed(() => {
+    return unreadNotifications.value.length;
+});
 const profilePicture = computed(() => {
     return user.profile_picture_url || "images/profile_placeholder.png";
+});
+
+onMounted(() => {
+    axios.get(route("notifications.get.unread")).then((response) => {
+        // console.log(response.data);
+        unreadNotifications.value = response.data;
+    });
 });
 </script>
 
@@ -39,6 +52,17 @@ const profilePicture = computed(() => {
                         :icon="HomeIcon"
                     >
                         Home
+                    </NavLink>
+                    <NavLink
+                        :href="route('notifications.show')"
+                        class="items-center text-2xl flex gap-4"
+                        :active="route().current('notifications')"
+                        :icon="BellIcon"
+                        :icon-size="32"
+                        :have-badge="true"
+                        :badge-data="unreadNotificationsCount"
+                    >
+                        Notifications
                     </NavLink>
                     <NavLink
                         :icon="MagnifyIcon"
