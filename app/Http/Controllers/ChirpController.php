@@ -52,6 +52,7 @@ class ChirpController extends Controller
         if ($chirp->user->id !== auth()->id()) {
             event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
         }
+
         return response()->json($chirp, 201);
     }
 
@@ -139,13 +140,12 @@ class ChirpController extends Controller
     {
         Gate::authorize('delete', $chirp);
         $parent = $chirp->parent_id;
+        $parentChirp = Chirp::find($parent);
         $chirp->delete();
         $context = $request->query('context');
+        event(new ReplyDeleted($parentChirp, auth()->user()));
         if ($context === 'reply') {
             return Inertia::location(route('chirp.show', $parent));
-        }
-        if ($chirp->user->id !== auth()->id()) {
-            event(new ReplyDeleted($chirp, auth()->user()));
         }
 
         return redirect(route('dashboard'));

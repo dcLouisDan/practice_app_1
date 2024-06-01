@@ -11,6 +11,7 @@ const props = defineProps({
         default: "base",
     },
 });
+console.log(props);
 const user = ref(props.user);
 const page = usePage();
 const authUser = page.props.auth.user;
@@ -39,13 +40,13 @@ const unfollow = async () => {
             user.value = response.data;
         });
 };
-function truncate(value, length) {
+const truncate = (value, length) => {
     if (value.length > length) {
         return value.substring(0, length) + "...";
     } else {
         return value;
     }
-}
+};
 </script>
 
 <template>
@@ -60,12 +61,12 @@ function truncate(value, length) {
                 class="rounded-full border-2 border-gray-500 h-12 w-12 object-cover"
             />
         </Link>
-        <div class="lg:flex flex-col hidden">
+        <div class="lg:flex flex-col">
             <Link
                 :href="route('profile.show', user.id)"
                 as="button"
                 class="text-lg text-gray-800 hover:text-gray-900 text-start"
-                >{{ user.name }}</Link
+                >{{ truncate(user.name, 20) }}</Link
             >
             <p class="text-sm text-gray-600">@{{ user.username }}</p>
         </div>

@@ -2,12 +2,12 @@
 
 namespace App\Listeners;
 
-use App\Events\ReplyDeleted;
-use App\Notifications\ChirpRepliedNotification;
+use App\Events\Unfollowed;
+use App\Notifications\FollowedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class DeleteChirpReplyNotification
+class DeleteFollowedNotification
 {
     /**
      * Create the event listener.
@@ -20,16 +20,15 @@ class DeleteChirpReplyNotification
     /**
      * Handle the event.
      */
-    public function handle(ReplyDeleted $event): void
+    public function handle(Unfollowed $event): void
     {
-        $chirp = $event->chirp;
+        $following = $event->following;
         $user = $event->user;
-        $notification = $chirp->user->notifications()
-            ->where('type', ChirpRepliedNotification::class)
-            ->where('data->chirp_id', $chirp->id)
+        $notification = $following->notifications()
+            ->where('type', FollowedNotification::class)
+            ->where('data->following_id', $following->id)
             ->where('data->user_id', $user->id)
             ->first();
-
         if ($notification) {
             $notification->delete();
         }

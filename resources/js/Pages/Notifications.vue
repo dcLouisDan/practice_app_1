@@ -15,9 +15,11 @@ onMounted(() => {
 <template>
     <AuthenticatedLayout>
         <MainHeader title="Notifications" />
-        <NotificationListItem
-            v-for="notification in notifications"
-            :notification="notification"
-        />
+        <div class="divide-y-2 border-b-2 divide-gray-300">
+            <NotificationListItem
+                v-for="notification in notifications"
+                :notification="notification"
+            />
+        </div>
     </AuthenticatedLayout>
 </template>

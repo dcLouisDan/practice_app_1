@@ -11,7 +11,7 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
         $notifications = $user->notifications;
-        // $user->unreadNotifications->markAsRead();
+        $user->unreadNotifications->markAsRead();
         return response()->json($notifications, 201);
     }
 

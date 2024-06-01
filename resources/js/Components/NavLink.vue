@@ -30,8 +30,8 @@ const props = defineProps({
 
 const classes = computed(() =>
     props.active
-        ? "inline-flex items-center px-1 py-3 font-medium text-lg leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out"
-        : "inline-flex items-center px-1 py-3 font-medium text-lg leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out"
+        ? "inline-flex items-center px-4 py-2 font-medium text-lg leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out hover:bg-gray-200 rounded-full w-fit"
+        : "inline-flex items-center px-4 py-2 font-medium text-lg leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out hover:bg-gray-200 rounded-full w-fit"
 );
 </script>
 
@@ -46,7 +46,7 @@ const classes = computed(() =>
             </div>
             <icon :is="icon" :size="iconSize" />
         </div>
-        <div class="hidden lg:block">
+        <div class="hidden lg:block pe-3">
             <slot />
         </div>
     </Link>

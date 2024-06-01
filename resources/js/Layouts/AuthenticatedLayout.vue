@@ -33,13 +33,8 @@ onMounted(() => {
         <div
             class="min-h-screen container mx-auto flex relative flex-col sm:flex-row justify-center"
         >
-            <header
-                class="sticky top-0 w-full flex justify-center py-3 border-b-2 sm:hidden"
-            >
-                <ApplicationLogo style="height: 50px" />
-            </header>
             <nav
-                class="sm:p-3 border-t-2 sm:border-t-0 sm:w-fit lg:w-64 border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:top-0 sm:min-h-screen sm:max-h-screen w-full"
+                class="sm:p-3 border-t-2 sm:border-t-0 sm:w-fit lg:w-64 border-gray-300 flex sm:flex-col fixed bottom-0 left-0 sm:sticky sm:top-0 sm:min-h-screen sm:max-h-screen w-full bg-gray-100 z-50"
             >
                 <ApplicationLogo style="height: 50px" class="hidden sm:block" />
                 <div
@@ -56,7 +51,7 @@ onMounted(() => {
                     <NavLink
                         :href="route('notifications.show')"
                         class="items-center text-2xl flex gap-4"
-                        :active="route().current('notifications')"
+                        :active="route().current('notifications.show')"
                         :icon="BellIcon"
                         :icon-size="32"
                         :have-badge="true"
@@ -109,7 +104,7 @@ onMounted(() => {
             <!-- Page Content -->
             <main class="flex-1 max-w-screen-sm sm:border-x-2">
                 <slot />
-                <div class="w-full h-12"></div>
+                <div class="w-full h-40"></div>
             </main>
             <section class="hidden lg:block lg:w-72">
                 <div class="pt-5 px-3 sm:sticky sm:top-0">

@@ -10,7 +10,7 @@ const isQueryEmpty = computed(() => {
     return props.query === "";
 });
 
-console.log(props.query);
+// console.log(props);
 </script>
 
 <template>

@@ -2,21 +2,20 @@
 
 namespace App\Notifications;
 
-use App\Models\Chirp;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ChirpLikedNotification extends Notification
+class FollowedNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Chirp $chirp, public User $user)
+    public function __construct(public User $following, public User $user)
     {
         //
     }
@@ -50,12 +49,12 @@ class ChirpLikedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'chirp_id' => $this->chirp->id,
-            'type' => 'like',
+            'following_id' => $this->following->id,
+            'type' => 'follow',
             'user_id' => $this->user->id,
             'user_name' => $this->user->name,
             'user_profile_picture_url' => $this->user->profile_picture_url,
-            'message' => "{$this->user->name} liked your chirp!"
+            'message' => "{$this->user->name} started following you!",
         ];
     }
 }

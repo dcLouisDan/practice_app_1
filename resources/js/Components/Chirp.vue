@@ -82,13 +82,13 @@ const profilePicture = computed(() => {
         "images/profile_placeholder.png"
     );
 });
-function truncate(value, length) {
+const truncate = (value, length) => {
     if (value.length > length) {
         return value.substring(0, length) + "...";
     } else {
         return value;
     }
-}
+};
 const refreshData = () => {
     console.log("refresh");
     emit("refreshData", { refresh: true });
@@ -104,6 +104,8 @@ const chirpClass = computed(() => {
         ? "flex flex-col z-10"
         : "flex flex-row gap-1 items-center z-10";
 });
+
+console.log(chirpData.value);
 </script>
 
 <template>

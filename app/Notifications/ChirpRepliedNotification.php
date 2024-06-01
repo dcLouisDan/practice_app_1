@@ -51,10 +51,12 @@ class ChirpRepliedNotification extends Notification
     {
         return [
             'chirp_id' => $this->chirp->id,
+            'type' => 'reply',
             'user_id' => $this->user->id,
             'user_name' => $this->user->name,
             'user_profile_picture_url' => $this->user->profile_picture_url,
-            'message' => "{$this->user->name} replied: \"{$this->message}\""
+            'message' => "{$this->user->name} replied:",
+            'content' => "\"{$this->message}\""
         ];
     }
 }

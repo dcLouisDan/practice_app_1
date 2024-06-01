@@ -21,6 +21,7 @@ const postReply = async () => {
             parent_id: chirpData.value.id,
         })
         .then((response) => {
+            console.log(response);
             chirpData.value = response.data;
             replyForm.reset();
         });

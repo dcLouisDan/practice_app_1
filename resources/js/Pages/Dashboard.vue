@@ -40,8 +40,8 @@ onMounted(async () => {
     <Head title="Home" />
 
     <AuthenticatedLayout>
-        <MainHeader :can-back="false" title="Home" />
-        <div class="">
+        <div class="relative">
+            <MainHeader :can-back="false" title="Home" class="sticky top-0" />
             <div
                 class="mx-auto px-4 pb-4 sm:p-4 sm:flex border-b-2 gap-2 pt-4 hidden"
             >
