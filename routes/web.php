@@ -25,6 +25,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
+    // return xdebug_info();
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/recommend/users', [ProfileController::class, 'recommendUsers'])->name('users.recommend');
