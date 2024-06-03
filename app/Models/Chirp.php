@@ -31,6 +31,11 @@ class Chirp extends Model
         return $this->hasMany(Chirp::class, 'parent_id')->with('user', 'likes', 'replies');
     }
 
+    public function media(): HasMany
+    {
+        return $this->hasMany(ChirpMedia::class);
+    }
+
     public function parent()
     {
         return $this->belongsTo(Chirp::class, 'parent_id')->with('user', 'likes', 'replies');

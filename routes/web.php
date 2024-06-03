@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::delete('/account/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
     Route::get('/chirp/{chirp}', function (Chirp $chirp) {
-        return Inertia::render('ChirpPage', ['chirp' => $chirp->load(['user', 'likes', 'replies', 'parent'])]);
+        return Inertia::render('ChirpPage', ['chirp' => $chirp->load(['user', 'likes', 'replies', 'parent', 'media'])]);
     })->name('chirp.show');
     Route::get('/chirp/{chirp}/data', [ChirpController::class, 'show'])->name('chirp.show.data');
     Route::post('/chirp/{chirp}/reply', [ChirpController::class, 'reply'])->name('chirp.reply');

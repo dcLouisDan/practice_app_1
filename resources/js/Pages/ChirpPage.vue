@@ -27,7 +27,7 @@ const inputOnBlur = () => {
 };
 
 const props = defineProps(["chirp"]);
-// console.log(props.chirp);
+console.log(props.chirp);
 const chirpData = ref(props.chirp);
 const page = usePage();
 const replyForm = useForm({

@@ -10,7 +10,7 @@ const content = defineModel({
     required: true,
 });
 
-const emit = defineEmits(["focus"]);
+const emit = defineEmits(["focus", "blur"]);
 
 const textarea = ref(null);
 const adjustHeight = () => {

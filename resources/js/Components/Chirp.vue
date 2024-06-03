@@ -8,6 +8,7 @@ import PrimaryButton from "./PrimaryButton.vue";
 import { onMounted, computed, ref } from "vue";
 import { Link, useForm, usePage, router } from "@inertiajs/vue3";
 import Modal from "./Modal.vue";
+import ChirpMedia from "./ChirpMedia.vue";
 import axios from "axios";
 
 dayjs.extend(relativeTime);
@@ -90,7 +91,7 @@ const truncate = (value, length) => {
     }
 };
 const refreshData = () => {
-    console.log("refresh");
+    // console.log("refresh");
     emit("refreshData", { refresh: true });
 };
 
@@ -104,8 +105,11 @@ const chirpClass = computed(() => {
         ? "flex flex-col z-10"
         : "flex flex-row gap-1 items-center z-10";
 });
+const media = computed(() => {
+    return chirpData.value.media ? chirpData.value.media : [];
+});
 
-console.log(chirpData.value);
+// console.log(chirpData.value);
 </script>
 
 <template>
@@ -124,128 +128,147 @@ console.log(chirpData.value);
             ></div>
         </div>
         <div class="px-6 py-3 flex relative gap-3">
-            <Link
-                :href="route(`profile.show`, chirpData.user.id)"
-                class="pointer-events-auto z-10"
-            >
-                <img
-                    :src="profilePicture"
-                    alt="Profile Picture"
-                    class="rounded-full h-10 w-10 object-cover"
-                />
-            </Link>
+            <div class="z-10 pointer-events-none">
+                <Link
+                    :href="route(`profile.show`, chirpData.user.id)"
+                    class="pointer-events-auto z-10"
+                >
+                    <img
+                        :src="profilePicture"
+                        alt="Profile Picture"
+                        class="rounded-full h-10 w-10 object-cover"
+                    />
+                </Link>
+            </div>
 
-            <div class="flex-1 pointer-events-none z-10">
-                <div class="flex justify-between items-center">
-                    <div :class="chirpClass">
-                        <Link
-                            :href="route(`profile.show`, chirpData.user.id)"
-                            class="text-gray-800 pointer-events-auto font-bold hidden md:block"
-                            >{{ truncate(chirpData.user.name, 20) }}</Link
-                        >
-                        <Link
-                            :href="route(`profile.show`, chirpData.user.id)"
-                            class="text-gray-800 pointer-events-auto font-bold block md:hidden"
-                            >{{ truncate(chirpData.user.name, 8) }}</Link
-                        >
-                        <p class="text-gray-500">
-                            @{{ truncate(chirpData.user.username, 8) }}
-                        </p>
-                        <small class="text-sm text-gray-600" v-if="!mainChirp"
-                            >&bull;
-                            {{ dayjs(chirpData.created_at).fromNow() }}</small
-                        >
-                        <small
-                            v-if="
-                                chirpData.created_at !== chirpData.updated_at &&
-                                !mainChirp
-                            "
-                            class="text-sm text-gray-600"
-                            >&middot; edited</small
-                        >
-                    </div>
-                    <Dropdown
-                        v-if="chirpData.user.id === $page.props.auth.user.id"
-                        class="z-50 pointer-events-auto"
-                    >
-                        <template #trigger>
-                            <button
-                                class="pointer-events-auto active:bg-gray-300 hover:bg-gray-200 h-7 w-7 flex items-center justify-center rounded-full transition-all ease-out"
+            <div class="flex-1 z-10">
+                <div class="pointer-events-none">
+                    <div class="flex justify-between items-center">
+                        <div :class="chirpClass">
+                            <Link
+                                :href="route(`profile.show`, chirpData.user.id)"
+                                class="text-gray-800 pointer-events-auto font-bold hidden md:block"
+                                >{{ truncate(chirpData.user.name, 20) }}</Link
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4 text-gray-400"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path
-                                        d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"
-                                    />
-                                </svg>
-                            </button>
-                        </template>
-                        <template #content>
-                            <button
-                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out"
-                                @click="editing = true"
+                            <Link
+                                :href="route(`profile.show`, chirpData.user.id)"
+                                class="text-gray-800 pointer-events-auto font-bold block md:hidden"
+                                >{{ truncate(chirpData.user.name, 8) }}</Link
                             >
-                                Edit
-                            </button>
-                            <DropdownLink
-                                as="button"
-                                :href="
-                                    route('chirps.destroy', {
-                                        chirp: chirpData.id,
-                                        _query: {
-                                            context: context,
-                                        },
-                                    })
+                            <p class="text-gray-500">
+                                @{{ truncate(chirpData.user.username, 8) }}
+                            </p>
+                            <small
+                                class="text-sm text-gray-600"
+                                v-if="!mainChirp"
+                                >&bull;
+                                {{
+                                    dayjs(chirpData.created_at).fromNow()
+                                }}</small
+                            >
+                            <small
+                                v-if="
+                                    chirpData.created_at !==
+                                        chirpData.updated_at && !mainChirp
                                 "
-                                @click="refreshData"
-                                method="delete"
+                                class="text-sm text-gray-600"
+                                >&middot; edited</small
                             >
-                                Delete
-                            </DropdownLink>
-                        </template>
-                    </Dropdown>
-                </div>
-                <form
-                    v-if="editing && !mainChirp"
-                    @submit.prevent="
-                        form.put(route('chirps.update', chirpData.id), {
-                            onSuccess: () => {
-                                editing = false;
-                                refreshData();
-                            },
-                        })
-                    "
-                    class="z-20"
-                >
-                    <textarea
-                        v-model="form.message"
-                        class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
-                    ></textarea>
-                    <InputError :message="form.errors.message" class="mt-2" />
-                    <div class="z-20 space-x-2 pointer-events-auto">
-                        <PrimaryButton class="z-10 mt-4">Save</PrimaryButton>
-                        <button
-                            class="mt-4"
-                            @click="
-                                editing = false;
-                                form.reset();
-                                form.clearErrors();
+                        </div>
+                        <Dropdown
+                            v-if="
+                                chirpData.user.id === $page.props.auth.user.id
                             "
+                            class="z-50 pointer-events-auto"
                         >
-                            Cancel
-                        </button>
+                            <template #trigger>
+                                <button
+                                    class="pointer-events-auto active:bg-gray-300 hover:bg-gray-200 h-7 w-7 flex items-center justify-center rounded-full transition-all ease-out"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 text-gray-400"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                            d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"
+                                        />
+                                    </svg>
+                                </button>
+                            </template>
+                            <template #content>
+                                <button
+                                    class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out"
+                                    @click="editing = true"
+                                >
+                                    Edit
+                                </button>
+                                <DropdownLink
+                                    as="button"
+                                    :href="
+                                        route('chirps.destroy', {
+                                            chirp: chirpData.id,
+                                            _query: {
+                                                context: context,
+                                            },
+                                        })
+                                    "
+                                    @click="refreshData"
+                                    method="delete"
+                                >
+                                    Delete
+                                </DropdownLink>
+                            </template>
+                        </Dropdown>
                     </div>
-                </form>
-                <p
-                    v-else-if="!editing && !mainChirp"
-                    class="z-10 text-lg text-gray-900"
-                >
-                    {{ chirpData.message }}
-                </p>
+                    <form
+                        v-if="editing && !mainChirp"
+                        @submit.prevent="
+                            form.put(route('chirps.update', chirpData.id), {
+                                onSuccess: () => {
+                                    editing = false;
+                                    refreshData();
+                                },
+                            })
+                        "
+                        class="z-20"
+                    >
+                        <textarea
+                            v-model="form.message"
+                            class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                        ></textarea>
+                        <InputError
+                            :message="form.errors.message"
+                            class="mt-2"
+                        />
+                        <div class="z-20 space-x-2 pointer-events-auto">
+                            <PrimaryButton class="z-10 mt-4"
+                                >Save</PrimaryButton
+                            >
+                            <button
+                                class="mt-4"
+                                @click="
+                                    editing = false;
+                                    form.reset();
+                                    form.clearErrors();
+                                "
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                    <p
+                        v-else-if="!editing && !mainChirp"
+                        class="z-10 text-lg text-gray-900 mb-2"
+                    >
+                        {{ chirpData.message }}
+                    </p>
+                </div>
+                <ChirpMedia
+                    v-if="media.length > 0 && !mainChirp"
+                    :media="media"
+                />
             </div>
             <Link
                 :href="route('chirp.show', chirpData.id)"
@@ -282,8 +305,10 @@ console.log(chirpData.value);
                     </button>
                 </div>
             </form>
-            <div v-else>{{ chirpData.message }}</div>
+            <div v-else class="mb-4">{{ chirpData.message }}</div>
+            <ChirpMedia v-if="media.length > 0" :media="media" />
         </div>
+
         <div class="ps-6 pb-3 space-x-1" v-if="mainChirp">
             <small class="text-sm text-gray-600">
                 {{ dayjs(chirpData.created_at) }}</small
