@@ -1,17 +1,26 @@
 <script setup>
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import InputError from "./InputError.vue";
 import DropdownLink from "./DropdownLink.vue";
 import Dropdown from "./Dropdown.vue";
 import PrimaryButton from "./PrimaryButton.vue";
-import { onMounted, computed, ref } from "vue";
-import { Link, useForm, usePage, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+import { Link, useForm, usePage } from "@inertiajs/vue3";
 import Modal from "./Modal.vue";
 import ChirpMedia from "./ChirpMedia.vue";
 import axios from "axios";
 
 dayjs.extend(relativeTime);
+dayjs.extend(timezone);
+dayjs.extend(utc);
+
+const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+// dayjs.tz.setDefault(userTimeZone);
+console.log(userTimeZone);
+const emit = defineEmits(["updateChirpData", "refreshData"]);
 const page = usePage();
 const user = page.props.auth.user;
 const props = defineProps({
@@ -28,8 +37,16 @@ const props = defineProps({
         type: String,
         default: "dashboard",
     },
+    nameTruncateLength: {
+        type: Number,
+        default: 20,
+    },
 });
+
 const chirpData = ref(props.chirp);
+const currentTime = dayjs(chirpData.value.created_at);
+console.log("edit", currentTime.format());
+
 const form = useForm({
     message: chirpData.value.message,
     content: props.context,
@@ -45,13 +62,17 @@ const likeChirp = async () => {
         .post(route("chirps.like", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
+            emit("updateChirpData", response.data);
         });
 };
-const emit = defineEmits(["updateChirpData", "refreshData"]);
 const replyForm = useForm({
     message: "",
     parent_id: chirpData.value.id,
 });
+const updateChirpData = (newData) => {
+    chirpData.value = newData;
+    emit("refreshData", { refresh: true });
+};
 const postReply = async () => {
     // console.log(replyForm);
     await axios
@@ -74,6 +95,7 @@ const unlikeChirp = async () => {
         .delete(route("chirps.unlike", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
+            emit("updateChirpData", response.data);
             // console.log(response);
         });
 };
@@ -108,7 +130,6 @@ const chirpClass = computed(() => {
 const media = computed(() => {
     return chirpData.value.media ? chirpData.value.media : [];
 });
-
 // console.log(chirpData.value);
 </script>
 
@@ -124,7 +145,7 @@ const media = computed(() => {
                 @refresh-data="refreshData"
             />
             <div
-                class="h-1/2 border-l-2 top-[60px] border-gray-300 absolute left-[43px]"
+                class="h-full border-l-2 top-4 border-gray-300 absolute left-[43px]"
             ></div>
         </div>
         <div class="px-6 py-3 flex relative gap-3">
@@ -148,7 +169,12 @@ const media = computed(() => {
                             <Link
                                 :href="route(`profile.show`, chirpData.user.id)"
                                 class="text-gray-800 pointer-events-auto font-bold hidden md:block"
-                                >{{ truncate(chirpData.user.name, 20) }}</Link
+                                >{{
+                                    truncate(
+                                        chirpData.user.name,
+                                        nameTruncateLength
+                                    )
+                                }}</Link
                             >
                             <Link
                                 :href="route(`profile.show`, chirpData.user.id)"
@@ -159,11 +185,11 @@ const media = computed(() => {
                                 @{{ truncate(chirpData.user.username, 8) }}
                             </p>
                             <small
-                                class="text-sm text-gray-600"
+                                class="text-xs text-gray-600"
                                 v-if="!mainChirp"
                                 >&bull;
                                 {{
-                                    dayjs(chirpData.created_at).fromNow()
+                                    dayjs(chirpData.created_at).fromNow(true)
                                 }}</small
                             >
                             <small
@@ -266,8 +292,10 @@ const media = computed(() => {
                     </p>
                 </div>
                 <ChirpMedia
+                    :chirp="chirpData"
                     v-if="media.length > 0 && !mainChirp"
                     :media="media"
+                    @update-chirp-data="updateChirpData"
                 />
             </div>
             <Link
@@ -306,13 +334,18 @@ const media = computed(() => {
                 </div>
             </form>
             <div v-else class="mb-4">{{ chirpData.message }}</div>
-            <ChirpMedia v-if="media.length > 0" :media="media" />
+            <ChirpMedia
+                :chirp="chirpData"
+                v-if="media.length > 0"
+                :media="media"
+                @update-chirp-data="updateChirpData"
+            />
         </div>
 
         <div class="ps-6 pb-3 space-x-1" v-if="mainChirp">
             <small class="text-sm text-gray-600">
-                {{ dayjs(chirpData.created_at) }}</small
-            >
+                {{ currentTime.format("h:mm A &bull; MMM D, YYYY") }}
+            </small>
             <small
                 v-if="chirpData.created_at !== chirpData.updated_at"
                 class="text-sm text-gray-600"

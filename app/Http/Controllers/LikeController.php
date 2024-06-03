@@ -49,7 +49,7 @@ class LikeController extends Controller
         if ($chirp->user->id !== auth()->id()) {
             event(new ChirpLiked($chirp, auth()->user()));
         }
-        return response()->json($chirp->load(['likes', 'user', 'replies', 'parent']), 201);
+        return response()->json($chirp->load(['likes', 'user', 'replies', 'parent', 'media']), 201);
     }
 
     /**
@@ -87,6 +87,6 @@ class LikeController extends Controller
         $chirp->likes()->where('user_id', auth()->id())->delete();
         $chirp->refresh();
 
-        return response()->json($chirp->load(['likes', 'user', 'replies', 'parent']), 201);
+        return response()->json($chirp->load(['likes', 'user', 'replies', 'parent', 'media']), 201);
     }
 }

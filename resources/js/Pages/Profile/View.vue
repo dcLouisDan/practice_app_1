@@ -17,11 +17,23 @@ const profilePicture = computed(() => {
     return user.profile_picture_url || "images/profile_placeholder.png";
 });
 
-onMounted(() => {
-    axios.get(route("chirps.showMine")).then((response) => {
-        chirps.value = response.data;
-        console.log(response.data);
-    });
+const fetchChirps = async () => {
+    try {
+        const response = await axios.get(route("chirps.index"));
+        // console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching chirps:", error);
+        return [];
+    }
+};
+
+const refreshData = async () => {
+    chirps.value = await fetchChirps();
+};
+
+onMounted(async () => {
+    chirps.value = await fetchChirps();
 });
 </script>
 
@@ -86,7 +98,13 @@ onMounted(() => {
             </div>
         </div>
         <div class="divide-y border-b-2">
-            <Chirp v-for="chirp in chirps" :key="chirp.id" :chirp="chirp" />
+            <Chirp
+                v-for="chirp in chirps"
+                :key="chirp.id"
+                :chirp="chirp"
+                @refresh-data="refreshData"
+                context="profile"
+            />
         </div>
     </AuthenticatedLayout>
 </template>

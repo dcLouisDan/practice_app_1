@@ -87,7 +87,7 @@ const isImage = (file) => {
             <InputError :message="form.errors.message" class="mt-2" />
             <div
                 v-if="mediaPreview.length > 0"
-                class="flex w-full overflow-x-auto"
+                class="flex w-full overflow-x-auto mt-2"
             >
                 <div class="flex gap-2">
                     <div
