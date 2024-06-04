@@ -14,7 +14,6 @@ const openModal = () => {
 const extra = computed(() => {
     return props.length - 4;
 });
-// console.log(props.media);
 </script>
 
 <template>
@@ -37,6 +36,8 @@ const extra = computed(() => {
             :src="media.media_url"
             v-if="media.media_type === 'image'"
             class="h-full object-cover w-full"
+            onerror="this.src='images/media_placeholder.png'"
+            alt="image"
         />
         <video
             controls
