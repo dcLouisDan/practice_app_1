@@ -19,6 +19,23 @@ const fetchChirps = async () => {
     }
 };
 
+const updateChirpData = (newData) => {
+    const updatedChirps = chirps.value.map((chirp) =>
+        chirp.id === newData.id
+            ? {
+                  ...chirp,
+                  message: newData.message,
+                  likes: newData.likes,
+                  replies: newData.replies,
+                  rechirps: newData.rechirps,
+              }
+            : chirp
+    );
+
+    console.log("update: ", updatedChirps);
+    chirps.value = updatedChirps;
+};
+
 const refreshData = async () => {
     chirps.value = await fetchChirps();
 };
@@ -50,6 +67,7 @@ onMounted(async () => {
                     :key="chirp.id"
                     :chirp="chirp"
                     @refresh-data="refreshData"
+                    @update-chirp-data="updateChirpData"
                 />
             </div>
         </div>

@@ -82,6 +82,6 @@ class RechirpController extends Controller
         $chirp->rechirps()->where('user_id', auth()->id())->delete();
         $chirp->refresh();
 
-        return response()->json($chirp->load(['user', 'likes', 'replies', 'parent', 'media', 'rechirps']), 201);
+        return response()->json($chirp->load(['user', 'likes', 'replies', 'media', 'rechirps']), 201);
     }
 }

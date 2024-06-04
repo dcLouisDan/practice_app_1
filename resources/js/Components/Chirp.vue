@@ -8,7 +8,7 @@ import DropdownLink from "./DropdownLink.vue";
 import Dropdown from "./Dropdown.vue";
 import PrimaryButton from "./PrimaryButton.vue";
 import { computed, ref } from "vue";
-import { Link, useForm, usePage } from "@inertiajs/vue3";
+import { Link, useForm, usePage, useRemember } from "@inertiajs/vue3";
 import Modal from "./Modal.vue";
 import ChirpMedia from "./ChirpMedia.vue";
 import axios from "axios";
@@ -54,16 +54,16 @@ const form = useForm({
 });
 
 const isLiked = computed(() => {
-    return chirpData.value.likes.some((like) => like.user_id === user.id);
+    return props.chirp.likes.some((like) => like.user_id === user.id);
 });
-const likeCount = computed(() => chirpData.value.likes.length);
+const likeCount = computed(() => props.chirp.likes.length);
 const replyCount = computed(() => props.chirp.replies.length);
 const isRechirped = computed(() => {
     return chirpData.value.rechirps.some(
         (rechirp) => rechirp.user_id === user.id
     );
 });
-const rechirpCount = computed(() => chirpData.value.rechirps.length);
+const rechirpCount = computed(() => props.chirp.rechirps.length);
 const rechirp = async () => {
     await axios
         .post(route("chirp.rechirp", chirpData.value.id))
@@ -90,14 +90,11 @@ const likeChirp = async () => {
             emit("updateChirpData", response.data);
         });
 };
-const replyForm = useForm({
-    message: "",
-    parent_id: chirpData.value.id,
-});
+
 const updateChirpData = (newData) => {
     chirpData.value = newData;
     if (route().current("chirp.show", chirpData.value.parent_id)) {
-        emit("updateChirpData", newData);
+        emit("updatechirpdata", newdata);
     }
     isReplyModalShow.value = false;
 
@@ -144,7 +141,16 @@ const chirpClass = computed(() => {
 const media = computed(() => {
     return chirpData.value.media ? chirpData.value.media : [];
 });
-console.log(chirpData.value.rechirps);
+
+const rechirped = computed(() => {
+    return chirpData.value.rechirper !== undefined;
+});
+const rechirper = computed(() => {
+    return chirpData.value.rechirper.name === user.name
+        ? "You"
+        : chirpData.value.rechirper.name;
+});
+// console.log(chirpData.value);
 </script>
 
 <template>
@@ -153,6 +159,7 @@ console.log(chirpData.value.rechirps);
             <Chirp
                 v-if="
                     chirpData.parent &&
+                    !rechirped &&
                     !route().current('chirp.show', chirpData.parent.id)
                 "
                 :chirp="chirpData.parent"
@@ -161,6 +168,14 @@ console.log(chirpData.value.rechirps);
             <div
                 class="h-full border-l-2 top-4 border-gray-300 absolute left-[43px]"
             ></div>
+        </div>
+        <div
+            class="flex items-center gap-1 text-sm px-6 pt-3 text-gray-500"
+            v-if="rechirped"
+        >
+            <span class="material-icons" style="font-size: 20px">cached</span>
+            Rechirped by
+            {{ rechirper }}
         </div>
         <div class="px-6 py-3 flex relative gap-3">
             <div class="z-10 pointer-events-none">

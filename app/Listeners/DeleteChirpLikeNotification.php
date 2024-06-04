@@ -28,7 +28,7 @@ class DeleteChirpLikeNotification
         $notification = $chirp->user->notifications()
             ->where('type', ChirpLikedNotification::class)
             ->where('data->chirp_id', $chirp->id)
-            ->where('user_id', $user->id)
+            ->where('data->user_id', $user->id)
             ->first();
         // dd($notification);
         if ($notification) {

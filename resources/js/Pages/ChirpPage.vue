@@ -12,6 +12,7 @@ const chirpData = ref(props.chirp);
 
 // console.log(chirpData.value);
 function updateChirpData(newValue) {
+    console.log("update page");
     chirpData.value = newValue;
 }
 

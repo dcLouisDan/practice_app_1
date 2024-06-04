@@ -6,6 +6,7 @@ use App\Events\ChirpReplied;
 use App\Events\ReplyDeleted;
 use App\Models\Chirp;
 use App\Models\ChirpMedia;
+use App\Models\Rechirp;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,25 +18,45 @@ use Inertia\Inertia;
 
 class ChirpController extends Controller
 {
+    private $chirpRelations = ['user', 'likes', 'replies', 'parent', 'media', 'rechirps'];
     /**
      * Display a listing of the resource.
      */
     public function index(): JsonResponse
     {
         $authUserId = auth()->id();
+        $rechirpedChirps = [];
+        $allChirps = Chirp::where(function ($query) use ($authUserId) {
+            $query->where('user_id', $authUserId)
+                ->orWhereIn('user_id', function ($subQuery) use ($authUserId) {
+                    $subQuery->select('following_id')
+                        ->from('followers')
+                        ->where('follower_id', $authUserId);
+                });
+        })->with($this->chirpRelations)
+            ->latest()
+            ->get()->toArray();
 
-        $ownChirps = Chirp::where('user_id', $authUserId)
-            ->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])
-            ->latest()->get()->toArray();
+        $rechirps = Rechirp::where(function ($query) use ($authUserId) {
+            $query->where('user_id', $authUserId)
+                ->orWhereIn('user_id', function ($subQuery) use ($authUserId) {
+                    $subQuery->select('following_id')
+                        ->from('followers')
+                        ->where('follower_id', $authUserId);
+                });
+        })->with(['user', 'chirp' => function ($query) {
+            $query->with($this->chirpRelations);
+        }])->latest()->get();
 
-        $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
-            $query->select('following_id')
-                ->from('followers')
-                ->where('follower_id', $authUserId);
-        })->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])
-            ->latest()->get()->toArray();
+        foreach ($rechirps as $rechirp) {
+            $chirp = $rechirp->chirp;
+            $chirp['rechirper'] = $rechirp->user->toArray();
+            $chirp['created_at'] = $rechirp->created_at;
+            $rechirpedChirps[] = $chirp->toArray();
+        }
 
-        $chirps = array_merge($ownChirps, $followedChirps);
+        $chirps = array_merge($allChirps, $rechirpedChirps);
+
         usort($chirps, function ($a, $b) {
             return strtotime($b['created_at']) - strtotime($a['created_at']);
         });
@@ -97,7 +118,7 @@ class ChirpController extends Controller
                 ]);
             }
         }
-        $chirp->refresh()->load(['user', 'replies', 'likes', 'parent', 'media', 'rechirps']);
+        $chirp->refresh()->load($this->chirpRelations);
         if ($chirp->user->id !== auth()->id()) {
             event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
         }
@@ -179,21 +200,21 @@ class ChirpController extends Controller
      */
     public function show(Chirp $chirp)
     {
-        $chirp = $chirp->load(['user', 'replies', 'likes', 'parent', 'media', 'rechirps']);
+        $chirp = $chirp->load($this->chirpRelations);
 
         return response()->json($chirp, 201);
     }
 
     public function showMyChirps(): JsonResponse
     {
-        $chirps = Chirp::where('user_id', auth()->id())->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])->latest()->get();
+        $chirps = Chirp::where('user_id', auth()->id())->with($this->chirpRelations)->latest()->get();
 
         return response()->json($chirps, 201);
     }
 
     public function showUserChirps(User $user): JsonResponse
     {
-        $chirps = Chirp::where('user_id', $user->id)->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])->latest()->get();
+        $chirps = Chirp::where('user_id', $user->id)->with($this->chirpRelations)->latest()->get();
 
         return response()->json($chirps, 201);
     }
