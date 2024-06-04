@@ -50,7 +50,7 @@ onMounted(async () => {
         />
         <NewChirpReplyInput
             :chirp_id="chirpData.id"
-            @update-chirp-data="refreshData"
+            @update-chirp-data="updateChirpData"
         />
         <div>
             <Chirp

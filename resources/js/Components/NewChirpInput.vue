@@ -40,7 +40,7 @@ const handleFileUpload = (event) => {
         url: URL.createObjectURL(file),
         type: file.type,
     }));
-    console.log(mediaPreview.value);
+    // console.log(mediaPreview.value);
 };
 const resetFileInput = () => {
     form.media = [];

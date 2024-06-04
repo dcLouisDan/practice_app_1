@@ -12,13 +12,14 @@ import { Link, useForm, usePage } from "@inertiajs/vue3";
 import Modal from "./Modal.vue";
 import ChirpMedia from "./ChirpMedia.vue";
 import axios from "axios";
+import NewChirpReplyInput from "./NewChirpReplyInput.vue";
 
 dayjs.extend(relativeTime);
 dayjs.extend(timezone);
 dayjs.extend(utc);
 
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-// dayjs.tz.setDefault(userTimeZone);
+dayjs.tz.setDefault(userTimeZone);
 console.log(userTimeZone);
 const emit = defineEmits(["updateChirpData", "refreshData"]);
 const page = usePage();
@@ -56,7 +57,7 @@ const isLiked = computed(() => {
     return chirpData.value.likes.some((like) => like.user_id === user.id);
 });
 const likeCount = computed(() => chirpData.value.likes.length);
-const replyCount = computed(() => chirpData.value.replies.length);
+const replyCount = computed(() => props.chirp.replies.length);
 const likeChirp = async () => {
     await axios
         .post(route("chirps.like", chirpData.value.id))
@@ -71,25 +72,14 @@ const replyForm = useForm({
 });
 const updateChirpData = (newData) => {
     chirpData.value = newData;
+    if (route().current("chirp.show", chirpData.value.parent_id)) {
+        emit("updateChirpData", newData);
+    }
+    isReplyModalShow.value = false;
+
     emit("refreshData", { refresh: true });
 };
-const postReply = async () => {
-    // console.log(replyForm);
-    await axios
-        .post(route("chirp.reply", chirpData.value.id), {
-            message: replyForm.message,
-            parent_id: replyForm.parent_id,
-        })
-        .then((response) => {
-            if (route().current("chirp.show", chirpData.value.parent_id)) {
-                emit("updateChirpData", response.data);
-            }
-            chirpData.value = response.data;
-            isReplyModalShow.value = false;
-            emit("refreshData", { refresh: true });
-            replyForm.reset();
-        });
-};
+
 const unlikeChirp = async () => {
     await axios
         .delete(route("chirps.unlike", chirpData.value.id))
@@ -460,29 +450,11 @@ const media = computed(() => {
                 >
             </div>
 
-            <div class="flex px-6 mt-4">
-                <img
-                    :src="page.props.auth.user.profile_picture_url"
-                    alt="Profile Picture"
-                    class="rounded-full h-10 w-10 object-cover"
-                />
-                <div class="w-full">
-                    <textarea
-                        v-model="replyForm.message"
-                        class="w-full text-gray-900 border-none resize-none focus:ring-0"
-                        placeholder="Write a reply..."
-                    ></textarea>
-                    <InputError
-                        :message="replyForm.errors.message"
-                        class="mt-2"
-                    />
-                </div>
-            </div>
-            <div class="py-2 px-4 flex">
-                <PrimaryButton class="ms-auto" @click="postReply">
-                    Reply
-                </PrimaryButton>
-            </div>
+            <NewChirpReplyInput
+                :chirp_id="chirpData.id"
+                @update-chirp-data="updateChirpData"
+                class="pb-3"
+            />
         </Modal>
     </div>
 </template>
