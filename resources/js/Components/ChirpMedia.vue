@@ -141,6 +141,12 @@ onMounted(() => {
         <div class="flex">
             <div class="relative flex-1 flex justify-center max-h-screen">
                 <button
+                    class="absolute pointer-events-auto active:bg-gray-500 z-50 top-8 left-10 bg-gray-600 bg-opacity-50 hover:bg-opacity-100 p-1 rounded-full text-white flex justify-center items-center"
+                    @click="showMediaModal = false"
+                >
+                    <span class="material-icons">close</span>
+                </button>
+                <button
                     class="p-1 bg-gray-300 rounded-full absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center hover:bg-gray-200 active:bg-gray-100 pointer-events-auto"
                     v-if="displayIndex > 0"
                     @click="displayIndex--"

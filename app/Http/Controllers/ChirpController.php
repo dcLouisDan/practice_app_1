@@ -24,13 +24,16 @@ class ChirpController extends Controller
     {
         $authUserId = auth()->id();
 
-        $ownChirps = Chirp::where('user_id', $authUserId)->with('user')->with('likes')->with('replies')->with('parent')->with('media')->latest()->get()->toArray();
+        $ownChirps = Chirp::where('user_id', $authUserId)
+            ->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])
+            ->latest()->get()->toArray();
 
         $followedChirps = Chirp::whereIn('user_id', function ($query) use ($authUserId) {
             $query->select('following_id')
                 ->from('followers')
                 ->where('follower_id', $authUserId);
-        })->with('user')->with('likes')->with('replies')->with('parent')->with('media')->latest()->get()->toArray();
+        })->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])
+            ->latest()->get()->toArray();
 
         $chirps = array_merge($ownChirps, $followedChirps);
         usort($chirps, function ($a, $b) {
@@ -94,7 +97,7 @@ class ChirpController extends Controller
                 ]);
             }
         }
-        $chirp->refresh()->load(['user', 'replies', 'likes', 'parent', 'media']);
+        $chirp->refresh()->load(['user', 'replies', 'likes', 'parent', 'media', 'rechirps']);
         if ($chirp->user->id !== auth()->id()) {
             event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
         }
@@ -176,21 +179,21 @@ class ChirpController extends Controller
      */
     public function show(Chirp $chirp)
     {
-        $chirp = $chirp->load(['user', 'replies', 'likes', 'parent', 'media']);
+        $chirp = $chirp->load(['user', 'replies', 'likes', 'parent', 'media', 'rechirps']);
 
         return response()->json($chirp, 201);
     }
 
     public function showMyChirps(): JsonResponse
     {
-        $chirps = Chirp::where('user_id', auth()->id())->with('user')->with('likes')->with('replies')->with('parent')->with('media')->latest()->get();
+        $chirps = Chirp::where('user_id', auth()->id())->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])->latest()->get();
 
         return response()->json($chirps, 201);
     }
 
     public function showUserChirps(User $user): JsonResponse
     {
-        $chirps = Chirp::where('user_id', $user->id)->with('user')->with('likes')->with('replies')->with('parent')->with('media')->latest()->get();
+        $chirps = Chirp::where('user_id', $user->id)->with(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])->latest()->get();
 
         return response()->json($chirps, 201);
     }

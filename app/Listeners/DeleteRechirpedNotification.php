@@ -2,13 +2,12 @@
 
 namespace App\Listeners;
 
-use App\Events\ChirpDisliked;
-use App\Events\ChirpLiked;
-use App\Notifications\ChirpLikedNotification;
+use App\Events\Unrechirped;
+use App\Notifications\RechirpedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class DeleteChirpLikeNotification
+class DeleteRechirpedNotification
 {
     /**
      * Create the event listener.
@@ -21,14 +20,15 @@ class DeleteChirpLikeNotification
     /**
      * Handle the event.
      */
-    public function handle(ChirpDisliked $event): void
+    public function handle(Unrechirped $event): void
     {
         $chirp = $event->chirp;
         $user = $event->user;
+
         $notification = $chirp->user->notifications()
-            ->where('type', ChirpLikedNotification::class)
+            ->where('type', RechirpedNotification::class)
             ->where('data->chirp_id', $chirp->id)
-            ->where('user_id', $user->id)
+            ->where('data->user_id', $user->id)
             ->first();
         // dd($notification);
         if ($notification) {

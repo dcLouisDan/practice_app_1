@@ -19,7 +19,7 @@ const profilePicture = computed(() => {
 
 const fetchChirps = async () => {
     try {
-        const response = await axios.get(route("chirps.index"));
+        const response = await axios.get(route("chirps.showMine"));
         // console.log(response.data);
         return response.data;
     } catch (error) {

@@ -9,14 +9,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ChirpRepliedNotification extends Notification
+class RechirpedNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Chirp $chirp, public User $user, public $message)
+    public function __construct(public Chirp $chirp, public User $user)
     {
         //
     }
@@ -51,12 +51,12 @@ class ChirpRepliedNotification extends Notification
     {
         return [
             'chirp_id' => $this->chirp->id,
-            'type' => 'reply',
+            'type' => 'rechirp',
             'user_id' => $this->user->id,
             'user_name' => $this->user->name,
-            'user_profile_picture_url' => $this->user->profile_picture_url,
-            'message' => "{$this->user->name} replied:",
-            'content' => $this->message
+            'user_profile_picture_url' => $this->user->profilePictureUrl,
+            'message' => "{$this->user->name} rechirped your chirp:",
+            'content' => $this->chirp->message
         ];
     }
 }

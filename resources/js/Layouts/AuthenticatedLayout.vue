@@ -81,7 +81,7 @@ onMounted(() => {
                         <img
                             :src="profilePicture"
                             alt="Profile Picture"
-                            class="rounded-full border-2 border-gray-500 h-12 w-12 object-cover"
+                            class="rounded-full h-12 w-12 object-cover"
                         />
                     </Link>
                     <div class="lg:flex flex-col hidden">

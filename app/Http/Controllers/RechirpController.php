@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ChirpDisliked;
-use App\Events\ChirpLiked;
+use App\Events\Rechirped;
+use App\Events\Unrechirped;
 use App\Models\Chirp;
-use App\Models\Like;
-use App\Notifications\ChirpLikedNotification;
+use App\Models\Rechirp;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class LikeController extends Controller
+class RechirpController extends Controller
 {
-
-    public function unlike(Chirp $chirp)
-    {
-    }
-
     /**
      * Display a listing of the resource.
      */
@@ -35,19 +30,19 @@ class LikeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Chirp $chirp)
+    public function store(Request $request, Chirp $chirp): JsonResponse
     {
-        if ($chirp->likes()->where('user_id', auth()->id())->exists()) {
-            return response()->json(['message' => 'Already Liked'], 422);
+        if ($chirp->rechirps()->where('user_id', auth()->id())->exists()) {
+            return response()->json(['message' => 'Already Rechirped'], 422);
         }
 
-        $chirp->likes()->create([
-            'user_id' => auth()->id(),
+        $chirp->rechirps()->create([
+            'user_id' => auth()->id()
         ]);
 
         $chirp->refresh();
         if ($chirp->user->id !== auth()->id()) {
-            event(new ChirpLiked($chirp, auth()->user()));
+            event(new Rechirped($chirp, auth()->user()));
         }
         return response()->json($chirp->load(['user', 'likes', 'replies', 'parent', 'media', 'rechirps']), 201);
     }
@@ -55,7 +50,7 @@ class LikeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Like $like)
+    public function show(Rechirp $rechirp)
     {
         //
     }
@@ -63,7 +58,7 @@ class LikeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Like $like)
+    public function edit(Rechirp $rechirp)
     {
         //
     }
@@ -71,7 +66,7 @@ class LikeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Like $like)
+    public function update(Request $request, Rechirp $rechirp)
     {
         //
     }
@@ -79,12 +74,12 @@ class LikeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Chirp $chirp)
+    public function destroy(Chirp $chirp): JsonResponse
     {
         if ($chirp->user->id !== auth()->id()) {
-            event(new ChirpDisliked($chirp, auth()->user()));
+            event(new Unrechirped($chirp, auth()->user()));
         }
-        $chirp->likes()->where('user_id', auth()->id())->delete();
+        $chirp->rechirps()->where('user_id', auth()->id())->delete();
         $chirp->refresh();
 
         return response()->json($chirp->load(['user', 'likes', 'replies', 'parent', 'media', 'rechirps']), 201);

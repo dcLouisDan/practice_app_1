@@ -20,7 +20,7 @@ dayjs.extend(utc);
 
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 dayjs.tz.setDefault(userTimeZone);
-console.log(userTimeZone);
+// console.log(userTimeZone);
 const emit = defineEmits(["updateChirpData", "refreshData"]);
 const page = usePage();
 const user = page.props.auth.user;
@@ -46,7 +46,7 @@ const props = defineProps({
 
 const chirpData = ref(props.chirp);
 const currentTime = dayjs(chirpData.value.created_at);
-console.log("edit", currentTime.format());
+// console.log("edit", currentTime.format());
 
 const form = useForm({
     message: chirpData.value.message,
@@ -58,6 +58,30 @@ const isLiked = computed(() => {
 });
 const likeCount = computed(() => chirpData.value.likes.length);
 const replyCount = computed(() => props.chirp.replies.length);
+const isRechirped = computed(() => {
+    return chirpData.value.rechirps.some(
+        (rechirp) => rechirp.user_id === user.id
+    );
+});
+const rechirpCount = computed(() => chirpData.value.rechirps.length);
+const rechirp = async () => {
+    await axios
+        .post(route("chirp.rechirp", chirpData.value.id))
+        .then((response) => {
+            chirpData.value = response.data;
+            console.log(response.data);
+            emit("updateChirpData", response.data);
+        });
+};
+const unrechirp = async () => {
+    await axios
+        .delete(route("chirp.unrechirp", chirpData.value.id))
+        .then((response) => {
+            chirpData.value = response.data;
+            console.log(response.data);
+            emit("updateChirpData", response.data);
+        });
+};
 const likeChirp = async () => {
     await axios
         .post(route("chirps.like", chirpData.value.id))
@@ -120,7 +144,7 @@ const chirpClass = computed(() => {
 const media = computed(() => {
     return chirpData.value.media ? chirpData.value.media : [];
 });
-// console.log(chirpData.value);
+console.log(chirpData.value.rechirps);
 </script>
 
 <template>
@@ -361,7 +385,32 @@ const media = computed(() => {
             </div>
             <div class="flex gap-3">
                 <button
+                    class="text-green-600 active:animate-likeBounce flex items-center"
+                    v-if="isRechirped"
+                    @click="unrechirp"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSize}`"
+                        >cached</span
+                    >
+                </button>
+                <button
                     class="text-gray-500 active:animate-likeBounce flex items-center"
+                    v-else
+                    @click="rechirp"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSize}`"
+                        >cached</span
+                    >
+                </button>
+                <div>{{ rechirpCount }}</div>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="text-red-600 active:animate-likeBounce flex items-center"
                     v-if="isLiked"
                     @click="unlikeChirp"
                 >
@@ -404,7 +453,32 @@ const media = computed(() => {
             </div>
             <div class="flex gap-3">
                 <button
+                    class="text-green-600 active:animate-likeBounce flex items-center"
+                    v-if="isRechirped"
+                    @click="unrechirp"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSizeLg}`"
+                        >cached</span
+                    >
+                </button>
+                <button
                     class="text-gray-500 active:animate-likeBounce flex items-center"
+                    v-else
+                    @click="rechirp"
+                >
+                    <span
+                        class="material-icons"
+                        :style="`font-size: ${iconSizeLg}`"
+                        >cached</span
+                    >
+                </button>
+                <div>{{ rechirpCount }}</div>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="text-red-600 active:animate-likeBounce flex items-center"
                     v-if="isLiked"
                     @click="unlikeChirp"
                 >

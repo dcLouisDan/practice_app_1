@@ -98,4 +98,9 @@ class User extends Authenticatable implements MustVerifyEmail
             ->with('followers')
             ->paginate($perPage);
     }
+
+    public function rechirps(): HasMany
+    {
+        return $this->hasMany(Rechirp::class)->with('chirp');
+    }
 }

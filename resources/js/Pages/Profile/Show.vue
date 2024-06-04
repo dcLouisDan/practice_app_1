@@ -33,11 +33,25 @@ const unfollow = async () => {
         });
 };
 
-onMounted(() => {
-    axios.get(route("profile.chirps.show", user.value.id)).then((response) => {
-        chirps.value = response.data;
-        console.log(response.data);
-    });
+const fetchChirps = async () => {
+    try {
+        const response = await axios.get(
+            route("profile.chirps.show", user.value.id)
+        );
+        // console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching chirps:", error);
+        return [];
+    }
+};
+
+const refreshData = async () => {
+    chirps.value = await fetchChirps();
+};
+
+onMounted(async () => {
+    chirps.value = await fetchChirps();
 });
 </script>
 

@@ -31,8 +31,15 @@ const notif = {
     },
     follow: {
         icon: "person",
-        class: "text-green-500",
+        class: "text-indigo-500",
         href: route("profile.show", notificationData.value.user_id),
+    },
+    rechirp: {
+        icon: "cached",
+        class: "text-green-500",
+        href: notificationData.value.chirp_id
+            ? route("chirp.show", notificationData.value.chirp_id)
+            : null,
     },
 };
 
@@ -60,7 +67,13 @@ const bg = computed(() => {
                 />
             </Link>
             <div class="font-bold">{{ notificationData.message }}</div>
-            <div v-if="notificationData.type === 'reply'" class="text-gray-600">
+            <div
+                v-if="
+                    notificationData.type === 'reply' ||
+                    notificationData.type === 'rechirp'
+                "
+                class="text-gray-600"
+            >
                 {{ notificationData.content }}
             </div>
         </div>
