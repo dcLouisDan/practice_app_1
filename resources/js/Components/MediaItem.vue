@@ -42,7 +42,7 @@ const extra = computed(() => {
         <video
             controls
             v-if="media.media_type === 'video'"
-            v-lazy="media.media_url"
+            :src="media.media_url"
             class="rounded-lg v-50"
         />
     </div>

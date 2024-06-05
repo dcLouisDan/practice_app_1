@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Response;
@@ -22,7 +23,7 @@ class ChirpController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $authUserId = auth()->id();
         $rechirpedChirps = [];
@@ -61,8 +62,20 @@ class ChirpController extends Controller
             return strtotime($b['created_at']) - strtotime($a['created_at']);
         });
 
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $start = ($currentPage - 1) * $perPage;
+        $currentPageItems = array_slice($chirps, $start, $perPage);
 
-        return response()->json($chirps, 201);
+        $paginatedChirps = new LengthAwarePaginator(
+            $currentPageItems,
+            count($chirps),
+            $perPage,
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+
+        return response()->json($paginatedChirps, 201);
     }
 
     public function reply(Request $request, Chirp $chirp)
