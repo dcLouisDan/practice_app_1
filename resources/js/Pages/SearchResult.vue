@@ -3,13 +3,49 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Search from "@/Components/Search.vue";
 import Chirp from "@/Components/Chirp.vue";
 import UserResult from "@/Components/UserResult.vue";
-import { computed } from "vue";
+import { ref, computed } from "vue";
 const props = defineProps({ query: String, users: Array, chirps: Array });
 
 const isQueryEmpty = computed(() => {
     return props.query === "";
 });
+const chirps = ref(props.chirps);
+const updateChirpData = (newData) => {
+    const updatedChirps = chirps.value.map((chirp) =>
+        chirp.id === newData.id
+            ? {
+                  ...chirp,
+                  message: newData.message,
+                  likes: newData.likes,
+                  replies: newData.replies,
+                  rechirps: newData.rechirps,
+                  parent: newData.parent,
+              }
+            : chirp
+    );
 
+    const updatedChirpParents = updatedChirps.map((chirp) => {
+        if (chirp.parent) {
+            return chirp.parent.id === newData.id
+                ? {
+                      ...chirp,
+                      parent: {
+                          ...chirp.parent,
+                          message: newData.message,
+                          likes: newData.likes,
+                          replies: newData.replies,
+                          rechirps: newData.rechirps,
+                      },
+                  }
+                : chirp;
+        } else {
+            return chirp;
+        }
+    });
+
+    console.log("update: ", updatedChirpParents);
+    chirps.value = updatedChirpParents;
+};
 // console.log(props);
 </script>
 
@@ -53,9 +89,10 @@ const isQueryEmpty = computed(() => {
                 No chirps found.
             </div>
             <Chirp
-                v-for="chirp in props.chirps"
+                v-for="chirp in chirps"
                 :chirp="chirp"
                 :key="chirp.id"
+                @update-chirp-data="updateChirpData"
             />
         </div>
     </AuthenticatedLayout>

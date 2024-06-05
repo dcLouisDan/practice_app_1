@@ -59,9 +59,7 @@ const isLiked = computed(() => {
 const likeCount = computed(() => props.chirp.likes.length);
 const replyCount = computed(() => props.chirp.replies.length);
 const isRechirped = computed(() => {
-    return chirpData.value.rechirps.some(
-        (rechirp) => rechirp.user_id === user.id
-    );
+    return props.chirp.rechirps.some((rechirp) => rechirp.user_id === user.id);
 });
 const rechirpCount = computed(() => props.chirp.rechirps.length);
 const rechirp = async () => {
@@ -69,7 +67,7 @@ const rechirp = async () => {
         .post(route("chirp.rechirp", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
-            console.log(response.data);
+            // console.log(response.data);
             emit("updateChirpData", response.data);
         });
 };
@@ -78,7 +76,7 @@ const unrechirp = async () => {
         .delete(route("chirp.unrechirp", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
-            console.log(response.data);
+            // console.log(response.data);
             emit("updateChirpData", response.data);
         });
 };
@@ -88,16 +86,22 @@ const likeChirp = async () => {
         .then((response) => {
             chirpData.value = response.data;
             emit("updateChirpData", response.data);
+            // console.log("like");
         });
 };
 
 const updateChirpData = (newData) => {
-    chirpData.value = newData;
+    if (chirpData.value.parent.id === newData.id) {
+        chirpData.value.parent = newData;
+        emit("updateChirpData", chirpData.value);
+    } else {
+        chirpData.value = newData;
+    }
     if (route().current("chirp.show", chirpData.value.parent_id)) {
-        emit("updatechirpdata", newdata);
+        emit("updateChirpData", newdata);
     }
     isReplyModalShow.value = false;
-
+    // console.log("Chirp emit");
     emit("refreshData", { refresh: true });
 };
 
@@ -162,8 +166,9 @@ const rechirper = computed(() => {
                     !rechirped &&
                     !route().current('chirp.show', chirpData.parent.id)
                 "
-                :chirp="chirpData.parent"
+                :chirp="chirp.parent"
                 @refresh-data="refreshData"
+                @update-chirp-data="updateChirpData"
             />
             <div
                 class="h-full border-l-2 top-4 border-gray-300 absolute left-[43px]"

@@ -19,12 +19,13 @@ const displayIndex = ref(3);
 const showMediaModal = ref(false);
 function updateChirpData(newValue) {
     chirpData.value = newValue;
+    console.log("Chirp Media Emit");
     emit("updateChirpData", newValue);
 }
 // console.log(props.media);
 
 const imageClick = (index) => {
-    console.log("Image Index: ", index);
+    // console.log("Image Index: ", index);
     displayIndex.value = index;
     showMediaModal.value = true;
 };
@@ -65,13 +66,6 @@ const postReply = async () => {
             replyForm.reset();
         });
 };
-
-onMounted(() => {
-    axios.get(route("chirp.show.data", props.chirp.id)).then((response) => {
-        chirpData.value = response.data;
-        // console.log(response.data);
-    });
-});
 </script>
 
 <template>

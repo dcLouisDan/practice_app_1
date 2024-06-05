@@ -28,12 +28,32 @@ const updateChirpData = (newData) => {
                   likes: newData.likes,
                   replies: newData.replies,
                   rechirps: newData.rechirps,
+                  parent: newData.parent,
               }
             : chirp
     );
 
-    console.log("update: ", updatedChirps);
-    chirps.value = updatedChirps;
+    const updatedChirpParents = updatedChirps.map((chirp) => {
+        if (chirp.parent) {
+            return chirp.parent.id === newData.id
+                ? {
+                      ...chirp,
+                      parent: {
+                          ...chirp.parent,
+                          message: newData.message,
+                          likes: newData.likes,
+                          replies: newData.replies,
+                          rechirps: newData.rechirps,
+                      },
+                  }
+                : chirp;
+        } else {
+            return chirp;
+        }
+    });
+
+    // console.log("update: ", updatedChirpParents);
+    chirps.value = updatedChirpParents;
 };
 
 const refreshData = async () => {

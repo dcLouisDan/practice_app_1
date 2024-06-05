@@ -27,9 +27,7 @@ class SearchController extends Controller
             })->with('followers')->get();
 
         $chirps = Chirp::where('message', 'LIKE', "%{$query}%")
-            ->with('user')
-            ->with('likes')
-            ->with('replies')
+            ->with('user', 'likes', 'replies', 'rechirps')
             ->latest()
             ->get();
 

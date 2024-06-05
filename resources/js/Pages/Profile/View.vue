@@ -35,6 +35,43 @@ const refreshData = async () => {
 onMounted(async () => {
     chirps.value = await fetchChirps();
 });
+
+const updateChirpData = (newData) => {
+    const updatedChirps = chirps.value.map((chirp) =>
+        chirp.id === newData.id
+            ? {
+                  ...chirp,
+                  message: newData.message,
+                  likes: newData.likes,
+                  replies: newData.replies,
+                  rechirps: newData.rechirps,
+                  parent: newData.parent,
+              }
+            : chirp
+    );
+
+    const updatedChirpParents = updatedChirps.map((chirp) => {
+        if (chirp.parent) {
+            return chirp.parent.id === newData.id
+                ? {
+                      ...chirp,
+                      parent: {
+                          ...chirp.parent,
+                          message: newData.message,
+                          likes: newData.likes,
+                          replies: newData.replies,
+                          rechirps: newData.rechirps,
+                      },
+                  }
+                : chirp;
+        } else {
+            return chirp;
+        }
+    });
+
+    // console.log("update: ", updatedChirpParents);
+    chirps.value = updatedChirpParents;
+};
 </script>
 
 <template>
@@ -104,6 +141,7 @@ onMounted(async () => {
                 :chirp="chirp"
                 @refresh-data="refreshData"
                 context="profile"
+                @update-chirp-data="updateChirpData"
             />
         </div>
     </AuthenticatedLayout>
