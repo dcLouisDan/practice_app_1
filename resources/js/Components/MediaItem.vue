@@ -33,7 +33,7 @@ const extra = computed(() => {
             + {{ extra }}
         </div>
         <img
-            :src="media.media_url"
+            v-lazy="media.media_url"
             v-if="media.media_type === 'image'"
             class="h-full object-cover w-full"
             onerror="this.src='images/media_placeholder.png'"
@@ -42,7 +42,7 @@ const extra = computed(() => {
         <video
             controls
             v-if="media.media_type === 'video'"
-            :src="media.media_url"
+            v-lazy="media.media_url"
             class="rounded-lg v-50"
         />
     </div>

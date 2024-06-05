@@ -63,7 +63,7 @@ const resetFileInput = () => {
     replyForm.media = [];
     mediaPreview.value = [];
     mediaInput.value.value = "";
-    isFocused = false;
+    isFocused.value = false;
 };
 
 const postReply = async () => {
