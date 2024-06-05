@@ -91,7 +91,7 @@ const likeChirp = async () => {
 };
 
 const updateChirpData = (newData) => {
-    if (chirpData.value.parent.id === newData.id) {
+    if (chirpData.value.parent?.id === newData.id) {
         chirpData.value.parent = newData;
         emit("updateChirpData", chirpData.value);
     } else {
@@ -102,7 +102,7 @@ const updateChirpData = (newData) => {
     }
     isReplyModalShow.value = false;
     // console.log("Chirp emit");
-    emit("refreshData", { refresh: true });
+    // emit("refreshData", { refresh: true });
 };
 
 const unlikeChirp = async () => {
@@ -147,12 +147,12 @@ const media = computed(() => {
 });
 
 const rechirped = computed(() => {
-    return chirpData.value.rechirper !== undefined;
+    return props.chirp.rechirper !== undefined;
 });
 const rechirper = computed(() => {
-    return chirpData.value.rechirper.name === user.name
+    return props.chirp.rechirper?.name === user.name
         ? "You"
-        : chirpData.value.rechirper.name;
+        : props.chirp.rechirper.name;
 });
 // console.log(chirpData.value);
 </script>
@@ -401,7 +401,7 @@ const rechirper = computed(() => {
                         >comment</span
                     >
                 </button>
-                <div>{{ replyCount }}</div>
+                <div class="w-12">{{ replyCount }}</div>
             </div>
             <div class="flex gap-3">
                 <button
@@ -426,7 +426,7 @@ const rechirper = computed(() => {
                         >cached</span
                     >
                 </button>
-                <div>{{ rechirpCount }}</div>
+                <div class="w-12">{{ rechirpCount }}</div>
             </div>
             <div class="flex gap-3">
                 <button
@@ -451,7 +451,7 @@ const rechirper = computed(() => {
                         >favorite_border</span
                     >
                 </button>
-                <div>{{ likeCount }}</div>
+                <div class="w-12">{{ likeCount }}</div>
             </div>
         </div>
         <div
@@ -469,7 +469,7 @@ const rechirper = computed(() => {
                         >comment</span
                     >
                 </button>
-                <div>{{ replyCount }}</div>
+                <div class="w-12">{{ replyCount }}</div>
             </div>
             <div class="flex gap-3">
                 <button
@@ -494,7 +494,7 @@ const rechirper = computed(() => {
                         >cached</span
                     >
                 </button>
-                <div>{{ rechirpCount }}</div>
+                <div class="w-12">{{ rechirpCount }}</div>
             </div>
             <div class="flex gap-3">
                 <button
@@ -519,7 +519,7 @@ const rechirper = computed(() => {
                         >favorite_border</span
                     >
                 </button>
-                <div>{{ likeCount }}</div>
+                <div class="w-12">{{ likeCount }}</div>
             </div>
         </div>
 

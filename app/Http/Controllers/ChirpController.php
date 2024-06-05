@@ -20,6 +20,7 @@ use Inertia\Inertia;
 class ChirpController extends Controller
 {
     private $chirpRelations = ['user', 'likes', 'replies', 'parent', 'media', 'rechirps'];
+    private $perPage = 10;
     /**
      * Display a listing of the resource.
      */
@@ -62,7 +63,7 @@ class ChirpController extends Controller
             return strtotime($b['created_at']) - strtotime($a['created_at']);
         });
 
-        $perPage = 10;
+        $perPage = $this->perPage;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $start = ($currentPage - 1) * $perPage;
         $currentPageItems = array_slice($chirps, $start, $perPage);
@@ -220,14 +221,14 @@ class ChirpController extends Controller
 
     public function showMyChirps(): JsonResponse
     {
-        $chirps = Chirp::where('user_id', auth()->id())->with($this->chirpRelations)->latest()->get();
+        $chirps = Chirp::where('user_id', auth()->id())->with($this->chirpRelations)->latest()->paginate($this->perPage);
 
         return response()->json($chirps, 201);
     }
 
     public function showUserChirps(User $user): JsonResponse
     {
-        $chirps = Chirp::where('user_id', $user->id)->with($this->chirpRelations)->latest()->get();
+        $chirps = Chirp::where('user_id', $user->id)->with($this->chirpRelations)->latest()->paginate($this->perPage);
 
         return response()->json($chirps, 201);
     }

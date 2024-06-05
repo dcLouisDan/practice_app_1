@@ -8,6 +8,10 @@ const props = defineProps({
         type: String,
         default: "chirps.index",
     },
+    routeParam: {
+        type: Number,
+        default: null,
+    },
 });
 
 const chirps = ref([]);
@@ -20,7 +24,10 @@ const fetchChirps = async () => {
     loading.value = true;
     try {
         const response = await axios.get(
-            route(props.route, { page: pageNumber.value })
+            route(props.route, {
+                page: pageNumber.value,
+                user: props.routeParam,
+            })
         );
         // console.log(response.data);
         // console.log(pageNumber.value);
@@ -71,7 +78,7 @@ const updateChirpData = (newData) => {
         }
     });
 
-    // console.log("update: ", updatedChirpParents);
+    console.log("update: ", updatedChirpParents);
     chirps.value = updatedChirpParents;
 };
 

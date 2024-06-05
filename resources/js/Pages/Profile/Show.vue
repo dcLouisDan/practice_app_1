@@ -5,6 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { Head, usePage } from "@inertiajs/vue3";
 import { computed, onMounted, ref } from "vue";
+import ChirpFeed from "@/Components/ChirpFeed.vue";
 
 const props = defineProps(["user"]);
 const page = usePage();
@@ -31,58 +32,6 @@ const unfollow = async () => {
             console.log(response);
             user.value = response.data;
         });
-};
-
-const fetchChirps = async () => {
-    try {
-        const response = await axios.get(
-            route("profile.chirps.show", user.value.id)
-        );
-        // console.log(response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching chirps:", error);
-        return [];
-    }
-};
-onMounted(async () => {
-    chirps.value = await fetchChirps();
-});
-const updateChirpData = (newData) => {
-    const updatedChirps = chirps.value.map((chirp) =>
-        chirp.id === newData.id
-            ? {
-                  ...chirp,
-                  message: newData.message,
-                  likes: newData.likes,
-                  replies: newData.replies,
-                  rechirps: newData.rechirps,
-                  parent: newData.parent,
-              }
-            : chirp
-    );
-
-    const updatedChirpParents = updatedChirps.map((chirp) => {
-        if (chirp.parent) {
-            return chirp.parent.id === newData.id
-                ? {
-                      ...chirp,
-                      parent: {
-                          ...chirp.parent,
-                          message: newData.message,
-                          likes: newData.likes,
-                          replies: newData.replies,
-                          rechirps: newData.rechirps,
-                      },
-                  }
-                : chirp;
-        } else {
-            return chirp;
-        }
-    });
-
-    // console.log("update: ", updatedChirpParents);
-    chirps.value = updatedChirpParents;
 };
 </script>
 
@@ -128,13 +77,6 @@ const updateChirpData = (newData) => {
                 </div>
             </div>
         </div>
-        <div class="divide-y border-b-2">
-            <Chirp
-                v-for="chirp in chirps"
-                :key="chirp.id"
-                :chirp="chirp"
-                @update-chirp-data="updateChirpData"
-            />
-        </div>
+        <ChirpFeed route="profile.chirps.show" :route-param="user.id" />
     </AuthenticatedLayout>
 </template>
