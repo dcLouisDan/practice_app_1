@@ -150,7 +150,7 @@ class ChirpController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse
     {
 
 
@@ -205,7 +205,7 @@ class ChirpController extends Controller
             }
         }
 
-        return redirect(route('dashboard'));
+        return response()->json($chirp->load($this->chirpRelations), 201);
     }
 
     /**

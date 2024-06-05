@@ -4,8 +4,9 @@ import { ref } from "vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AutoResizeTextarea from "@/Components/AutoResizeTextarea.vue";
+import axios from "axios";
 
-const emit = defineEmits(["refreshData"]);
+const emit = defineEmits(["refreshData", "newChirp"]);
 const page = usePage();
 const user = page.props.auth.user;
 const mediaInput = ref(null);
@@ -47,20 +48,27 @@ const resetFileInput = () => {
     mediaPreview.value = [];
     mediaInput.value.value = "";
 };
-const postChirp = () => {
+const postChirp = async () => {
     const formData = new FormData();
     formData.append("message", form.message);
     form.media.forEach((file, index) => {
         formData.append(`media[${index}]`, file);
     });
 
-    form.post(route("chirps.store"), {
-        data: formData,
-        onSuccess: () => {
-            form.reset();
-            resetFileInput();
-            refreshData();
-        },
+    // form.post(route("chirps.store"), {
+    //     data: formData,
+    //     onSuccess: (response) => {
+    //         const data = response.props.data;
+    //         console.log(data);
+    //         form.reset();
+    //         resetFileInput();
+    //         refreshData();
+    //     },
+    // });
+    await axios.post(route("chirps.store"), formData).then((response) => {
+        emit("newChirp", response.data);
+        form.reset();
+        resetFileInput();
     });
 };
 const isImage = (file) => {
