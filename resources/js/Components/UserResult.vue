@@ -11,7 +11,7 @@ const props = defineProps({
         default: "base",
     },
 });
-console.log(props);
+// console.log(props);
 const user = ref(props.user);
 const page = usePage();
 const authUser = page.props.auth.user;

@@ -77,6 +77,6 @@ const unfollow = async () => {
                 </div>
             </div>
         </div>
-        <ChirpFeed route="profile.chirps.show" :route-param="user.id" />
+        <ChirpFeed route="profile.chirps.show" :user-param="user.id" />
     </AuthenticatedLayout>
 </template>

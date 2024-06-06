@@ -8,9 +8,13 @@ const props = defineProps({
         type: String,
         default: "chirps.index",
     },
-    routeParam: {
+    userParam: {
         type: Number,
         default: null,
+    },
+    searchParam: {
+        type: String,
+        default: "",
     },
 });
 
@@ -26,11 +30,12 @@ const fetchChirps = async () => {
         const response = await axios.get(
             route(props.route, {
                 page: pageNumber.value,
-                user: props.routeParam,
+                user: props.userParam,
+                query: props.searchParam,
             })
         );
         // console.log(response.data);
-        // console.log(pageNumber.value);
+        console.log(pageNumber.value);
         if (!response.data.next_page_url) {
             hasMore.value = false;
         }
@@ -98,7 +103,11 @@ const refreshData = async () => {
         chirps.value = [];
         pageNumber.value = 1;
         const response = await axios.get(
-            route(props.route, { page: pageNumber.value })
+            route(props.route, {
+                page: pageNumber.value,
+                user: props.userParam,
+                query: props.searchParam,
+            })
         );
         // console.log(response.data);
         // console.log(pageNumber.value);
@@ -136,6 +145,12 @@ defineExpose({
 <template>
     <div class="divide-y-2">
         <div v-if="loading" class="text-center py-4">Loading...</div>
+        <div
+            v-if="searchParam !== '' && chirps.length === 0"
+            class="text-center text-gray-500 py-5"
+        >
+            No Chirps found
+        </div>
         <Chirp
             v-for="chirp in chirps"
             :key="chirp.id"
