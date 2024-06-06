@@ -9,7 +9,7 @@ const notificationData = computed(() => {
     return props.notification.data;
 });
 
-console.log(notificationData.value.chirp_id);
+// console.log(notificationData.value.chirp_id);
 
 const wasRead = computed(() => {
     return props.notification.read_at != null;

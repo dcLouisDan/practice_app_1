@@ -54,7 +54,7 @@ onMounted(() => {
     </div>
     <UserResult v-for="user in users" :user="user" :key="user.id" />
     <button
-        class="text-center py-3 w-full hover:bg-gray-200 active:bg-gray-50"
+        class="text-center text-sm py-3 w-full hover:bg-gray-200 active:bg-gray-50"
         v-if="hasMore"
         @click="fetchUsers"
     >

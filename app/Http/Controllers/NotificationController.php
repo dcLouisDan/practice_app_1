@@ -10,7 +10,7 @@ class NotificationController extends Controller
     public function index(): JsonResponse
     {
         $user = auth()->user();
-        $notifications = $user->notifications;
+        $notifications = $user->notifications()->paginate(5);
         $user->unreadNotifications->markAsRead();
         return response()->json($notifications, 201);
     }

@@ -5,11 +5,36 @@ import NotificationListItem from "@/Components/NotificationListItem.vue";
 import { ref, onMounted } from "vue";
 const notifications = ref([]);
 
-onMounted(() => {
-    axios.get(route("notifications.get")).then((response) => {
+const pageNumber = ref(1);
+const loading = ref(false);
+const hasMore = ref(true);
+
+const fetchNotifications = async () => {
+    if (loading.value || !hasMore.value) return;
+    loading.value = true;
+    try {
+        const response = await axios.get(
+            route("notifications.get", {
+                page: pageNumber.value,
+            })
+        );
         // console.log(response.data);
-        notifications.value = response.data;
-    });
+        // console.log(pageNumber.value);
+        if (!response.data.next_page_url) {
+            hasMore.value = false;
+        }
+
+        pageNumber.value += 1;
+        return notifications.value.push(...response.data.data);
+    } catch (error) {
+        console.error("Error fetching chirps:", error);
+        return [];
+    } finally {
+        loading.value = false;
+    }
+};
+onMounted(() => {
+    fetchNotifications();
 });
 </script>
 <template>
@@ -26,6 +51,13 @@ onMounted(() => {
                 v-for="notification in notifications"
                 :notification="notification"
             />
+            <button
+                class="text-sm font-bold text-center py-3 w-full hover:bg-gray-200 active:bg-gray-50"
+                v-if="hasMore"
+                @click="fetchNotifications"
+            >
+                Show More
+            </button>
         </div>
     </AuthenticatedLayout>
 </template>
