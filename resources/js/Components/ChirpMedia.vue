@@ -4,7 +4,7 @@ import MediaItem from "./MediaItem.vue";
 import Chirp from "./Chirp.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import InputError from "@/Components/InputError.vue";
 import AutoResizeTextarea from "@/Components/AutoResizeTextarea.vue";
 
@@ -17,11 +17,11 @@ const chirpData = ref(props.chirp);
 const page = usePage();
 const displayIndex = ref(3);
 const showMediaModal = ref(false);
-function updateChirpData(newValue) {
+const updateChirpData = (newValue) => {
     chirpData.value = newValue;
     console.log("Chirp Media Emit");
     emit("updateChirpData", newValue);
-}
+};
 // console.log(props.media);
 
 const imageClick = (index) => {
@@ -47,6 +47,25 @@ const inputOnBlur = () => {
         divClass.value = "flex-row";
     }
 };
+
+const handleKeyPress = (event) => {
+    if (event.key === "ArrowLeft" && displayIndex.value > 0) {
+        displayIndex.value--;
+    } else if (
+        event.key === "ArrowRight" &&
+        displayIndex.value < props.media.length - 1
+    ) {
+        displayIndex.value++;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener("keydown", handleKeyPress);
+});
+
+onUnmounted(() => {
+    document.removeEventListener("keydown", handleKeyPress);
+});
 
 // console.log(props.chirp);
 
@@ -80,13 +99,13 @@ const postReply = async () => {
         </div>
         <div
             v-if="media.length === 2 && media[0].media_type === 'image'"
-            class="flex gap-1 rounded-lg overflow-hidden w-fit"
+            class="grid grid-cols-2 gap-1 rounded-lg overflow-hidden w-fit"
         >
             <MediaItem
                 v-for="(image, index) in media"
                 :media="image"
                 :index="index"
-                class="h-72 w-72 object-cover v-50"
+                class="h-72 object-cover v-50"
                 @open-modal="imageClick"
                 :length="media.length"
             />
@@ -134,21 +153,6 @@ const postReply = async () => {
     <MediaModal :show="showMediaModal" @close="showMediaModal = false">
         <div class="flex">
             <div class="relative flex-1 flex justify-center max-h-screen">
-                <button
-                    class="absolute pointer-events-auto active:bg-gray-500 z-50 top-8 left-10 bg-gray-600 bg-opacity-50 hover:bg-opacity-100 p-1 rounded-full text-white flex justify-center items-center"
-                    @click="showMediaModal = false"
-                >
-                    <span class="material-icons">close</span>
-                </button>
-                <button
-                    class="p-1 bg-gray-300 rounded-full absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center hover:bg-gray-200 active:bg-gray-100 pointer-events-auto"
-                    v-if="displayIndex > 0"
-                    @click="displayIndex--"
-                >
-                    <span style="font-size: 32px" class="material-icons"
-                        >chevron_left</span
-                    >
-                </button>
                 <TransitionGroup
                     enter-active-class="ease-out duration-200"
                     enter-from-class="opacity-0 "
@@ -163,21 +167,40 @@ const postReply = async () => {
                         class="absolute h-screen p-2"
                         v-show="displayIndex === index"
                     >
-                        <img :src="image.media_url" class="h-full shadow-lg" />
+                        <button
+                            class="absolute pointer-events-auto active:bg-gray-500 z-50 top-8 left-10 bg-gray-600 bg-opacity-50 hover:bg-opacity-100 p-1 rounded-full text-white flex justify-center items-center"
+                            @click="showMediaModal = false"
+                        >
+                            <span class="material-icons">close</span>
+                        </button>
+
+                        <img
+                            :src="image.media_url"
+                            class="h-full shadow-lg object-contain"
+                        />
+                        <button
+                            class="p-1 bg-gray-300 bg-opacity-50 rounded-full absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center hover:bg-gray-200 active:bg-gray-100 pointer-events-auto"
+                            v-if="displayIndex > 0"
+                            @click="displayIndex--"
+                        >
+                            <span style="font-size: 32px" class="material-icons"
+                                >chevron_left</span
+                            >
+                        </button>
+                        <button
+                            class="p-1 bg-gray-300 bg-opacity-50 rounded-full absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center hover:bg-gray-200 active:bg-gray-100 pointer-events-auto"
+                            v-if="displayIndex < media.length - 1"
+                            @click="displayIndex++"
+                        >
+                            <span style="font-size: 32px" class="material-icons"
+                                >chevron_right</span
+                            >
+                        </button>
                     </div>
                 </TransitionGroup>
-                <button
-                    class="p-1 bg-gray-300 rounded-full absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center hover:bg-gray-200 active:bg-gray-100 pointer-events-auto"
-                    v-if="displayIndex < media.length - 1"
-                    @click="displayIndex++"
-                >
-                    <span style="font-size: 32px" class="material-icons"
-                        >chevron_right</span
-                    >
-                </button>
             </div>
             <div
-                class="bg-gray-100 h-screen overflow-y-auto w-96 pointer-events-auto"
+                class="bg-gray-100 h-screen overflow-y-auto w-96 pointer-events-auto hidden md:block"
             >
                 <Chirp
                     class="border-b-2"

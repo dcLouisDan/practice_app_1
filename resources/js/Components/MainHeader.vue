@@ -11,9 +11,9 @@ const back = () => window.history.back();
 </script>
 <template>
     <div class="bg-gray-100 z-50">
-        <div class="flex items-center justify-center py-2 sm:hidden">
+        <!-- <div class="flex items-center justify-center py-2 sm:hidden">
             <ApplicationLogo class="h-12" />
-        </div>
+        </div> -->
         <div
             class="py-3 px-5 flex gap-3 items-center border-b-2 border-gray-300"
         >
