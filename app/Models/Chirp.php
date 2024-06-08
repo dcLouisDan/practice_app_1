@@ -13,7 +13,8 @@ class Chirp extends Model
 
     protected $fillable = [
         'message',
-        'parent_id'
+        'parent_id',
+        'quote_id'
     ];
 
     public function user(): BelongsTo

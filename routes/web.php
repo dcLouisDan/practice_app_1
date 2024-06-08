@@ -60,7 +60,7 @@ Route::middleware('auth')->group(function () {
 
     //Chirps
     Route::get('/chirp/{chirp}', function (Chirp $chirp) {
-        return Inertia::render('ChirpPage', ['chirp' => $chirp->load(['user', 'likes', 'replies', 'parent', 'media', 'rechirps'])]);
+        return Inertia::render('ChirpPage', ['chirp' => $chirp->load(['user', 'likes', 'replies', 'parent', 'media', 'rechirps', 'quotedChirp'])]);
     })->name('chirp.show');
     Route::get('/chirp/{chirp}/data', [ChirpController::class, 'show'])->name('chirp.show.data');
     Route::post('/chirp/{chirp}/reply', [ChirpController::class, 'reply'])->name('chirp.reply');

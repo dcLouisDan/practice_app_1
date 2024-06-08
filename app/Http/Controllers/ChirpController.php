@@ -174,7 +174,7 @@ class ChirpController extends Controller
         if (isset($validated['quote_id'])) {
             $chirpNew = $request->user()->chirps()->create([
                 'message' => $validated['message'],
-                'quote_id' => $validated['parent_id'],
+                'quote_id' => $validated['quote_id'],
             ]);
         } else {
             $chirpNew = $request->user()->chirps()->create([
@@ -194,12 +194,11 @@ class ChirpController extends Controller
                 ]);
             }
         }
-        $chirp->refresh()->load($this->chirpRelations);
         if ($chirp->user->id !== auth()->id()) {
             event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
         }
 
-        return response()->json($chirp, 201);
+        return response()->json($chirpNew->load($this->chirpRelations), 201);
     }
     /**
      * Show the form for creating a new resource.
@@ -267,7 +266,7 @@ class ChirpController extends Controller
             }
         }
 
-        return response()->json($chirp->load($this->chirpRelations), 201);
+        return response()->json($chirp->refresh()->load($this->chirpRelations), 201);
     }
 
     /**

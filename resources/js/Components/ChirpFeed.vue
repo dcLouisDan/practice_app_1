@@ -125,6 +125,10 @@ const refreshData = async () => {
     }
 };
 
+const addChirp = (newData) => {
+    chirps.value.unshift(newData);
+};
+
 onMounted(() => {
     fetchChirps();
     window.addEventListener("scroll", handleScroll);
@@ -137,7 +141,9 @@ onUnmounted(() => {
 defineExpose({
     refreshData,
     newChirp(newChirpData) {
+        console.log(newChirpData);
         chirps.value.unshift(newChirpData);
+        console.log(chirps.value);
     },
 });
 </script>
@@ -157,6 +163,7 @@ defineExpose({
             :chirp="chirp"
             @refresh-data="refreshData"
             @update-chirp-data="updateChirpData"
+            @new-chirp="addChirp"
         />
     </div>
 </template>

@@ -8,6 +8,7 @@ import { ref } from "vue";
 
 const chirpFeed = ref(null);
 const newChirp = (newData) => {
+    // console.log(newData);
     chirpFeed.value.newChirp(newData);
 };
 </script>

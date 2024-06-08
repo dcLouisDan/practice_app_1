@@ -1,24 +1,39 @@
 <script setup>
 import { Link, usePage, useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AutoResizeTextarea from "@/Components/AutoResizeTextarea.vue";
 import axios from "axios";
+import Chirp from "./Chirp.vue";
+
+const props = defineProps({
+    context: {
+        type: String,
+        default: "dashboard",
+    },
+    quotedChirp: {
+        type: Object,
+        default: null,
+    },
+});
 
 const emit = defineEmits(["refreshData", "newChirp"]);
 const page = usePage();
 const user = page.props.auth.user;
 const mediaInput = ref(null);
 const mediaPreview = ref([]);
+const textareaPlaceholder = computed(() => {
+    return props.context === "quote"
+        ? "Add a comment..."
+        : "What's on your mind?";
+});
 
 const form = useForm({
     message: "",
     media: [],
 });
-const refreshData = () => {
-    emit("refreshData");
-};
+
 const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     const images = files.filter((file) => file.type.startsWith("image/"));
@@ -55,21 +70,24 @@ const postChirp = async () => {
         formData.append(`media[${index}]`, file);
     });
 
-    // form.post(route("chirps.store"), {
-    //     data: formData,
-    //     onSuccess: (response) => {
-    //         const data = response.props.data;
-    //         console.log(data);
-    //         form.reset();
-    //         resetFileInput();
-    //         refreshData();
-    //     },
-    // });
-    await axios.post(route("chirps.store"), formData).then((response) => {
-        emit("newChirp", response.data);
-        form.reset();
-        resetFileInput();
-    });
+    if (props.context === "quote" && props.quotedChirp !== null) {
+        formData.append("quote_id", props.quotedChirp?.id);
+        await axios
+            .post(route("chirp.quote", props.quotedChirp?.id), formData)
+            .then((response) => {
+                emit("newChirp", response.data);
+                form.reset();
+                resetFileInput();
+            });
+    }
+    if (props.context === "dashboard") {
+        await axios.post(route("chirps.store"), formData).then((response) => {
+            console.log(response.data);
+            emit("newChirp", response.data);
+            form.reset();
+            resetFileInput();
+        });
+    }
 };
 const isImage = (file) => {
     const imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
@@ -89,7 +107,7 @@ const isImage = (file) => {
         <form @submit.prevent="postChirp" class="flex flex-col flex-1">
             <AutoResizeTextarea
                 v-model="form.message"
-                placeholder="What's on your mind?"
+                :placeholder="textareaPlaceholder"
                 class="block w-full focus:ring-0 max-h-36"
             ></AutoResizeTextarea>
             <InputError :message="form.errors.message" class="mt-2" />
@@ -117,6 +135,12 @@ const isImage = (file) => {
                         ></video>
                     </div>
                 </div>
+            </div>
+            <div
+                v-if="context === 'quote' && quotedChirp != null"
+                class="border-2 rounded-xl"
+            >
+                <Chirp :chirp="quotedChirp" context="quote" />
             </div>
             <div class="flex mt-2 items-center">
                 <button
