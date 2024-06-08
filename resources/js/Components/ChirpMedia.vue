@@ -19,13 +19,10 @@ const displayIndex = ref(3);
 const showMediaModal = ref(false);
 const updateChirpData = (newValue) => {
     chirpData.value = newValue;
-    console.log("Chirp Media Emit");
     emit("updateChirpData", newValue);
 };
-// console.log(props.media);
 
 const imageClick = (index) => {
-    // console.log("Image Index: ", index);
     displayIndex.value = index;
     showMediaModal.value = true;
 };
@@ -67,8 +64,6 @@ onUnmounted(() => {
     document.removeEventListener("keydown", handleKeyPress);
 });
 
-// console.log(props.chirp);
-
 const replyForm = useForm({
     message: "",
 });
@@ -79,7 +74,6 @@ const postReply = async () => {
             parent_id: chirpData.value.id,
         })
         .then((response) => {
-            console.log(response);
             chirpData.value = response.data;
             emit("updateChirpData", response.data);
             replyForm.reset();
@@ -164,7 +158,7 @@ const postReply = async () => {
                     <div
                         v-for="(image, index) in media"
                         :key="index"
-                        class="absolute h-screen p-2"
+                        class="absolute h-screen p-2 w-full"
                         v-show="displayIndex === index"
                     >
                         <button
@@ -176,7 +170,7 @@ const postReply = async () => {
 
                         <img
                             :src="image.media_url"
-                            class="h-full shadow-lg object-contain"
+                            class="h-full shadow-lg object-contain mx-auto"
                         />
                         <button
                             class="p-1 bg-gray-300 bg-opacity-50 rounded-full absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center hover:bg-gray-200 active:bg-gray-100 pointer-events-auto"
@@ -207,6 +201,7 @@ const postReply = async () => {
                     :chirp="chirpData"
                     :main-chirp="true"
                     context="post"
+                    :quote-name-truncate-length="3"
                     @update-chirp-data="updateChirpData"
                 />
 

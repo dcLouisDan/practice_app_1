@@ -9,8 +9,6 @@ const notificationData = computed(() => {
     return props.notification.data;
 });
 
-console.log(notificationData.value);
-
 const wasRead = computed(() => {
     return props.notification.read_at != null;
 });

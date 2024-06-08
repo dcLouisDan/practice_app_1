@@ -21,7 +21,6 @@ const isFollowingByAuthUser = computed(() => {
 });
 const follow = async () => {
     await axios.post(route("user.follow", user.value.id)).then((response) => {
-        console.log(response);
         user.value = response.data;
     });
 };
@@ -29,7 +28,6 @@ const unfollow = async () => {
     await axios
         .delete(route("user.unfollow", user.value.id))
         .then((response) => {
-            console.log(response);
             user.value = response.data;
         });
 };

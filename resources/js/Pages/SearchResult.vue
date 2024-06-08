@@ -9,7 +9,6 @@ const props = defineProps({ query: String, users: Array, chirps: Array });
 const isQueryEmpty = computed(() => {
     return props.query === "";
 });
-// console.log(props);
 </script>
 
 <template>

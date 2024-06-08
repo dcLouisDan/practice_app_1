@@ -23,8 +23,6 @@ const fetchUsers = async () => {
                 query: props.searchParam,
             })
         );
-        // console.log(response.data);
-        // console.log(pageNumber.value);
         if (!response.data.next_page_url) {
             hasMore.value = false;
         }

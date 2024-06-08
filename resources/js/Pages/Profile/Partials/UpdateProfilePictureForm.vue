@@ -47,19 +47,16 @@ const getResult = async () => {
     if (!blob) return;
     isShowModal.value = false;
     imageform.profile_picture = blob;
-    console.log(imageform.profile_picture);
-    console.log(imageform.processing);
     uploadImage();
 };
 
 const uploadImage = () => {
     imageform.post(route("profilePicture.update"), {
         onSuccess: (response) => {
-            console.log(response);
             imageform.reset();
         },
         onError: (response) => {
-            console.log(response);
+            console.error(response);
         },
     });
 };
@@ -76,7 +73,6 @@ const reset = () => {
 
 const ready = () => {
     if (!cropper) return;
-    console.log("Cropper Ready");
 };
 
 const profilePicture = computed(() => {

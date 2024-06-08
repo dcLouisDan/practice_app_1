@@ -17,6 +17,7 @@ class Chirp extends Model
         'quote_id'
     ];
 
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -49,7 +50,7 @@ class Chirp extends Model
 
     public function quotedChirp()
     {
-        return $this->belongsTo(Chirp::class, 'quote_id')->with('user', 'likes', 'replies', 'media', 'rechirps');
+        return $this->belongsTo(Chirp::class, 'quote_id')->with('user', 'likes', 'replies', 'media', 'rechirps', 'quotedChirp');
     }
     public function rechirps(): HasMany
     {

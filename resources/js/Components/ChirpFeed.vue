@@ -34,8 +34,6 @@ const fetchChirps = async () => {
                 query: props.searchParam,
             })
         );
-        // console.log(response.data);
-        console.log(pageNumber.value);
         if (!response.data.next_page_url) {
             hasMore.value = false;
         }
@@ -83,7 +81,6 @@ const updateChirpData = (newData) => {
         }
     });
 
-    console.log("update: ", updatedChirpParents);
     chirps.value = updatedChirpParents;
 };
 
@@ -109,8 +106,6 @@ const refreshData = async () => {
                 query: props.searchParam,
             })
         );
-        // console.log(response.data);
-        // console.log(pageNumber.value);
         if (!response.data.next_page_url) {
             hasMore.value = false;
         }
@@ -141,9 +136,7 @@ onUnmounted(() => {
 defineExpose({
     refreshData,
     newChirp(newChirpData) {
-        console.log(newChirpData);
         chirps.value.unshift(newChirpData);
-        console.log(chirps.value);
     },
 });
 </script>

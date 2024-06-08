@@ -6,14 +6,12 @@ const recommendedUsers = ref([]);
 
 const fetchUsers = async () => {
     return await axios.get(route("users.recommend")).then((response) => {
-        // console.log(response.data);
         recommendedUsers.value = response.data.data;
     });
 };
 
 onMounted(() => {
     fetchUsers();
-    // console.log(recommendedUsers.value);
 });
 </script>
 

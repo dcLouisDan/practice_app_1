@@ -96,12 +96,12 @@ const isImage = (file) => {
 </script>
 
 <template>
-    <div class="mx-auto px-4 pb-4 sm:p-4 sm:flex border-b-2 gap-2 pt-4 hidden">
+    <div class="mx-auto px-4 pb-4 sm:p-4 sm:flex border-b-2 gap-2 pt-4">
         <Link :href="route('profile.view')" as="button" class="mb-auto">
             <img
                 :src="user.profile_picture_url"
                 alt="Profile Picture"
-                class="rounded-full h-14 w-14 object-cover"
+                class="rounded-full h-10 w-10 sm:h-14 sm:w-14 object-cover"
             />
         </Link>
         <form @submit.prevent="postChirp" class="flex flex-col flex-1">

@@ -57,7 +57,6 @@ const handleFileUpload = (event) => {
         url: URL.createObjectURL(file),
         type: file.type,
     }));
-    // console.log(mediaPreview.value);
 };
 const resetFileInput = () => {
     replyForm.media = [];
@@ -77,7 +76,6 @@ const postReply = async () => {
     await axios
         .post(route("chirp.reply", props.chirp_id), formData)
         .then((response) => {
-            // console.log(response);
             emit("updateChirpData", response.data);
             replyForm.reset();
             resetFileInput;

@@ -7,12 +7,9 @@ import { Head } from "@inertiajs/vue3";
 import { onMounted, ref } from "vue";
 
 const props = defineProps(["chirp"]);
-// console.log(props.chirp);
 const chirpData = ref(props.chirp);
 
-// console.log(chirpData.value);
 function updateChirpData(newValue) {
-    console.log("update page");
     chirpData.value = newValue;
 }
 
@@ -21,7 +18,6 @@ const fetchChirps = async () => {
         const response = await axios.get(
             route("chirp.show.data", props.chirp.id)
         );
-        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching chirps:", error);

@@ -21,7 +21,6 @@ dayjs.extend(utc);
 
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 dayjs.tz.setDefault(userTimeZone);
-// console.log(userTimeZone);
 const emit = defineEmits(["updateChirpData", "refreshData", "newChirp"]);
 const page = usePage();
 const user = page.props.auth.user;
@@ -43,12 +42,14 @@ const props = defineProps({
         type: Number,
         default: 20,
     },
+    quoteNameTruncateLength: {
+        type: Number,
+        default: 20,
+    },
 });
 
 const chirpData = ref(props.chirp);
-// console.log(chirpData.value);
 const currentTime = dayjs(props.chirp.created_at);
-// console.log("edit", currentTime.format());
 
 const form = useForm({
     message: chirpData.value.message,
@@ -69,7 +70,6 @@ const rechirp = async () => {
         .post(route("chirp.rechirp", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
-            // console.log(response.data);
             emit("updateChirpData", response.data);
         });
 };
@@ -78,7 +78,6 @@ const unrechirp = async () => {
         .delete(route("chirp.unrechirp", chirpData.value.id))
         .then((response) => {
             chirpData.value = response.data;
-            // console.log(response.data);
             emit("updateChirpData", response.data);
         });
 };
@@ -88,7 +87,6 @@ const likeChirp = async () => {
         .then((response) => {
             chirpData.value = response.data;
             emit("updateChirpData", response.data);
-            // console.log("like");
         });
 };
 
@@ -103,7 +101,6 @@ const updateChirpData = (newData) => {
         emit("updateChirpData", newdata);
     }
     isReplyModalShow.value = false;
-    // console.log("Chirp emit");
     // emit("refreshData", { refresh: true });
 };
 const newChirp = (newData) => {
@@ -117,7 +114,6 @@ const unlikeChirp = async () => {
         .then((response) => {
             chirpData.value = response.data;
             emit("updateChirpData", response.data);
-            // console.log(response);
         });
 };
 const profilePicture = computed(() => {
@@ -134,11 +130,9 @@ const truncate = (value, length) => {
     }
 };
 const refreshData = () => {
-    // console.log("refresh");
     emit("refreshData", { refresh: true });
 };
 
-// console.log(props.context);
 const iconSize = "18px";
 const iconSizeLg = "24px";
 const editing = ref(false);
@@ -161,7 +155,6 @@ const rechirper = computed(() => {
         ? "You"
         : props.chirp.rechirper.name;
 });
-// console.log(props.chirp);
 </script>
 
 <template>
@@ -424,7 +417,11 @@ const rechirper = computed(() => {
                     v-if="chirp.quote_id !== null"
                     class="border-2 rounded-lg mt-2"
                 >
-                    <Chirp :chirp="chirp.quoted_chirp" context="quote" />
+                    <Chirp
+                        :chirp="chirp.quoted_chirp"
+                        context="quote"
+                        :name-truncate-length="quoteNameTruncateLength"
+                    />
                 </div>
             </div>
         </div>

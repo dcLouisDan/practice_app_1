@@ -22,7 +22,6 @@ const profilePicture = computed(() => {
 
 onMounted(() => {
     axios.get(route("notifications.get.unread")).then((response) => {
-        // console.log(response.data);
         unreadNotifications.value = response.data;
     });
 });
