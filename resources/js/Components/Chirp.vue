@@ -414,6 +414,12 @@ const rechirper = computed(() => {
             </form>
             <div v-else class="mb-4">
                 <div>{{ chirpData.message }}</div>
+                <ChirpMedia
+                    :chirp="chirpData"
+                    v-if="media.length > 0"
+                    :media="media"
+                    @update-chirp-data="updateChirpData"
+                />
                 <div
                     v-if="chirp.quote_id !== null"
                     class="border-2 rounded-lg mt-2"
@@ -421,12 +427,6 @@ const rechirper = computed(() => {
                     <Chirp :chirp="chirp.quoted_chirp" context="quote" />
                 </div>
             </div>
-            <ChirpMedia
-                :chirp="chirpData"
-                v-if="media.length > 0"
-                :media="media"
-                @update-chirp-data="updateChirpData"
-            />
         </div>
 
         <div class="ps-6 pb-3 space-x-1" v-if="mainChirp">
