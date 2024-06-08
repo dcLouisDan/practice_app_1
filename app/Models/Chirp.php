@@ -41,6 +41,15 @@ class Chirp extends Model
         return $this->belongsTo(Chirp::class, 'parent_id')->with('user', 'likes', 'replies', 'media', 'rechirps');
     }
 
+    public function quotes()
+    {
+        return $this->hasMany(Chirp::class, 'quote_id')->with('user', 'likes', 'replies', 'media', 'rechirps');
+    }
+
+    public function quotedChirp()
+    {
+        return $this->belongsTo(Chirp::class, 'quote_id')->with('user', 'likes', 'replies', 'media', 'rechirps');
+    }
     public function rechirps(): HasMany
     {
         return $this->hasMany(Rechirp::class)->with('user', 'chirp');
