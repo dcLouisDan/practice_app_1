@@ -355,7 +355,11 @@ const rechirper = computed(() => {
                     />
                 </div>
                 <div
-                    v-if="chirp.quote_id !== null && context != 'quote'"
+                    v-if="
+                        chirp.quote_id !== null &&
+                        context != 'quote' &&
+                        !mainChirp
+                    "
                     class="border-2 rounded-lg mt-2"
                 >
                     <Chirp

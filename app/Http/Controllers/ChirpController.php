@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChirpQuoted;
+use App\Events\ChirpQuoteDeleted;
 use App\Events\ChirpReplied;
 use App\Events\ReplyDeleted;
 use App\Models\Chirp;
@@ -195,7 +197,7 @@ class ChirpController extends Controller
             }
         }
         if ($chirp->user->id !== auth()->id()) {
-            event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
+            event(new ChirpQuoted($chirp, auth()->user(), $validated['message'], $chirpNew));
         }
 
         return response()->json($chirpNew->load($this->chirpRelations), 201);
@@ -331,6 +333,8 @@ class ChirpController extends Controller
         Gate::authorize('delete', $chirp);
         $parent = $chirp->parent_id;
         $parentChirp = Chirp::find($parent);
+        $quote_id = $chirp->quote_id;
+        $quoted_chirp = Chirp::find($quote_id);
         if ($chirp->media) {
             foreach ($chirp->media as $media) {
                 Storage::disk('public')->delete($media->media_path);
@@ -340,6 +344,9 @@ class ChirpController extends Controller
         $context = $request->query('context');
         if ($parentChirp) {
             event(new ReplyDeleted($parentChirp, auth()->user()));
+        }
+        if ($quoted_chirp) {
+            event(new ChirpQuoteDeleted($quoted_chirp, auth()->user()));
         }
         if ($context === 'reply') {
             return Inertia::location(route('chirp.show', $parent));

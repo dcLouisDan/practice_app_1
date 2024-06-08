@@ -9,7 +9,7 @@ const notificationData = computed(() => {
     return props.notification.data;
 });
 
-// console.log(notificationData.value.chirp_id);
+console.log(notificationData.value);
 
 const wasRead = computed(() => {
     return props.notification.read_at != null;
@@ -41,11 +41,20 @@ const notif = {
             ? route("chirp.show", notificationData.value.chirp_id)
             : null,
     },
+    quote: {
+        icon: "cached",
+        class: "text-green-500",
+        href: notificationData.value.chirp_id
+            ? route("chirp.show", notificationData.value.quote_chirp_id)
+            : null,
+    },
 };
 
 const bg = computed(() => {
     return wasRead.value ? "bg-gray-100" : "bg-blue-100";
 });
+
+const typesWithContent = ["reply", "rechirp", "quote"];
 </script>
 <template>
     <div :class="`flex px-4 py-3 ${bg} relative`">
@@ -68,11 +77,8 @@ const bg = computed(() => {
             </Link>
             <div class="font-bold">{{ notificationData.message }}</div>
             <div
-                v-if="
-                    notificationData.type === 'reply' ||
-                    notificationData.type === 'rechirp'
-                "
-                class="text-gray-600"
+                v-if="typesWithContent.indexOf(notification.data.type) != -1"
+                class="text-gray-600 mt-1"
             >
                 {{ notificationData.content }}
             </div>
