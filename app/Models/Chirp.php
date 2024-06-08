@@ -30,7 +30,7 @@ class Chirp extends Model
 
     public function replies(): HasMany
     {
-        return $this->hasMany(Chirp::class, 'parent_id')->with('user', 'likes', 'replies', 'media', 'rechirps');
+        return $this->hasMany(Chirp::class, 'parent_id')->with('user', 'likes', 'replies', 'media', 'rechirps', 'quotedChirp');
     }
 
     public function media(): HasMany
@@ -40,7 +40,7 @@ class Chirp extends Model
 
     public function parent()
     {
-        return $this->belongsTo(Chirp::class, 'parent_id')->with('user', 'likes', 'replies', 'media', 'rechirps');
+        return $this->belongsTo(Chirp::class, 'parent_id')->with('user', 'likes', 'replies', 'media', 'rechirps', 'quotedChirp');
     }
 
     public function quotes()
