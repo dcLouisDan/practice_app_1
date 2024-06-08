@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     // Rechirp
     Route::post('/chirp/{chirp}/rechirp', [RechirpController::class, 'store'])->name('chirp.rechirp');
     Route::delete('/chirp/{chirp}/unrechirp', [RechirpController::class, 'destroy'])->name('chirp.unrechirp');
+    Route::post('/chirp/{chirp}/quote', [ChirpController::class, 'quoteRechirp'])->name('chirp.quote');
 
     // Follow
     Route::post('/account/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');

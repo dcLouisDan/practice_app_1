@@ -318,12 +318,18 @@ const rechirper = computed(() => {
                             </button>
                         </div>
                     </form>
-                    <p
-                        v-else-if="!editing && !mainChirp"
-                        class="z-10 text-lg text-gray-900 mb-2"
+
+                    <Link
+                        :href="route('chirp.show', chirpData.id)"
+                        v-else-if="
+                            !route().current('chirp.show', chirpData.id) &&
+                            !editing &&
+                            !mainChirp
+                        "
+                        class="z-10 text-lg text-gray-900 mb-2 pointer-events-auto"
                     >
-                        {{ chirpData.message }}
-                    </p>
+                        {{ chirpData.message }}</Link
+                    >
                 </div>
                 <ChirpMedia
                     :chirp="chirpData"
@@ -387,7 +393,7 @@ const rechirper = computed(() => {
             >
         </div>
         <div
-            class="pt-1 pb-1 px-8 flex z-0 justify-around"
+            class="pt-1 pb-1 px-8 flex z-50 justify-around"
             v-if="!isModal && !mainChirp"
         >
             <div class="flex gap-3">
@@ -404,28 +410,67 @@ const rechirper = computed(() => {
                 <div class="w-12">{{ replyCount }}</div>
             </div>
             <div class="flex gap-3">
-                <button
-                    class="text-green-600 active:animate-likeBounce flex items-center"
-                    v-if="isRechirped"
-                    @click="unrechirp"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSize}`"
-                        >cached</span
-                    >
-                </button>
-                <button
-                    class="text-gray-500 active:animate-likeBounce flex items-center"
-                    v-else
-                    @click="rechirp"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSize}`"
-                        >cached</span
-                    >
-                </button>
+                <Dropdown class="z-50 pointer-events-auto">
+                    <template #trigger>
+                        <button
+                            class="text-green-600 active:animate-likeBounce flex items-center"
+                            v-if="isRechirped"
+                        >
+                            <span
+                                class="material-icons"
+                                :style="`font-size: ${iconSize}`"
+                                >cached</span
+                            >
+                        </button>
+                        <button
+                            class="text-gray-500 active:animate-likeBounce flex items-center"
+                            v-else
+                        >
+                            <span
+                                class="material-icons"
+                                :style="`font-size: ${iconSize}`"
+                                >cached</span
+                            >
+                        </button>
+                    </template>
+                    <template #content>
+                        <button
+                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                            @click="rechirp"
+                            v-if="!isRechirped"
+                        >
+                            <span
+                                class="material-icons"
+                                :style="`font-size: ${iconSize}`"
+                                >cached</span
+                            >
+                            Rechirp
+                        </button>
+                        <button
+                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                            @click="unrechirp"
+                            v-if="isRechirped"
+                        >
+                            <span
+                                class="material-icons"
+                                :style="`font-size: ${iconSize}`"
+                                >cached</span
+                            >
+                            Undo Rechirp
+                        </button>
+                        <button
+                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                        >
+                            <span
+                                class="material-icons"
+                                :style="`font-size: ${iconSize}`"
+                                >edit_note</span
+                            >
+                            Quote
+                        </button>
+                    </template>
+                </Dropdown>
+
                 <div class="w-12">{{ rechirpCount }}</div>
             </div>
             <div class="flex gap-3">

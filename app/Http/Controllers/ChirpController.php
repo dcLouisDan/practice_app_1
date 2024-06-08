@@ -19,7 +19,7 @@ use Inertia\Inertia;
 
 class ChirpController extends Controller
 {
-    private $chirpRelations = ['user', 'likes', 'replies', 'parent', 'media', 'rechirps'];
+    private $chirpRelations = ['user', 'likes', 'replies', 'parent', 'media', 'rechirps', 'quotedChirp'];
     private $perPage = 10;
     /**
      * Display a listing of the resource.
@@ -140,6 +140,67 @@ class ChirpController extends Controller
         return response()->json($chirp, 201);
     }
 
+
+    public function quoteRechirp(Request $request, Chirp $chirp)
+    {
+
+
+        $media = $request->file('media');
+        if ($media) {
+            $validated = $request->validate([
+                'message' => 'nullable|string|max:255',
+                'quote_id' => 'nullable|exists:chirps,id',
+                'media.*' => 'nullable|mimes:jpg,jpeg,png,gif,mp4,mov,avi|max:25600'
+            ]);
+            $validated['message'] = $validated['message'] ?? "";
+
+            $images = array_filter($media, fn ($file) => str_starts_with($file->getMimeType(), 'image/'));
+            $videos = array_filter($media, fn ($file) => str_starts_with($file->getMimeType(), 'video/'));
+
+            if (count($videos) > 1) {
+                return back()->withErrors(['media' => 'You can only upload one video']);
+            }
+
+            if (count($videos) > 1 && count($images) > 0) {
+                return back()->withErrors(['media' => 'You can only multiple images or one video, but not both']);
+            }
+        } else {
+            $validated = $request->validate([
+                'message' => 'required|string|max:255',
+                'quote_id' => 'nullable|exists:chirps,id',
+                'media.*' => 'nullable|mimes:jpg,jpeg,png,gif,mp4,mov,avi|max:25600'
+            ]);
+        }
+        if (isset($validated['quote_id'])) {
+            $chirpNew = $request->user()->chirps()->create([
+                'message' => $validated['message'],
+                'quote_id' => $validated['parent_id'],
+            ]);
+        } else {
+            $chirpNew = $request->user()->chirps()->create([
+                'message' => $validated['message'],
+            ]);
+        }
+
+        if ($media) {
+            foreach ($request->file('media') as $file) {
+                $mediaPath = $file->store('chirp_media', 'public');
+                $mediaType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
+
+                ChirpMedia::create([
+                    'chirp_id' => $chirpNew->id,
+                    'media_path' => $mediaPath,
+                    'media_type' => $mediaType
+                ]);
+            }
+        }
+        $chirp->refresh()->load($this->chirpRelations);
+        if ($chirp->user->id !== auth()->id()) {
+            event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
+        }
+
+        return response()->json($chirp, 201);
+    }
     /**
      * Show the form for creating a new resource.
      */
