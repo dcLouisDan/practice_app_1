@@ -150,6 +150,16 @@ defineExpose({
         >
             No Chirps found
         </div>
+        <div
+            v-if="!loading && chirps.length === 0"
+            class="text-center text-gray-500 py-10 px-2 sm:px-10"
+        >
+            <div class="font-bold text-xl">Welcome to Chirper!</div>
+            <div>
+                Your feed is currently empty. To see content, you can either
+                create your first chirp or follow other users.
+            </div>
+        </div>
         <Chirp
             v-for="chirp in chirps"
             :key="chirp.id"
