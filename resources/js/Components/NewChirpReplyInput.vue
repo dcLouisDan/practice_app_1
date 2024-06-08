@@ -8,7 +8,7 @@ import AutoResizeTextarea from "@/Components/AutoResizeTextarea.vue";
 const props = defineProps({
     chirp_id: Number,
 });
-const emit = defineEmits(["updateChirpData"]);
+const emit = defineEmits(["updateChirpData", "newChirp"]);
 
 const isFocused = ref(false);
 const textareaRows = ref(1);
@@ -76,7 +76,9 @@ const postReply = async () => {
     await axios
         .post(route("chirp.reply", props.chirp_id), formData)
         .then((response) => {
-            emit("updateChirpData", response.data);
+            emit("updateChirpData", response.data.chirp);
+            emit("newChirp", response.data.reply);
+
             replyForm.reset();
             resetFileInput;
         });

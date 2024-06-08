@@ -96,9 +96,7 @@ const updateChirpData = (newData) => {
         emit("updateChirpData", chirpData.value);
     } else {
         chirpData.value = newData;
-    }
-    if (route().current("chirp.show", chirpData.value.parent_id)) {
-        emit("updateChirpData", newdata);
+        emit("updateChirpData", newData);
     }
     isReplyModalShow.value = false;
     // emit("refreshData", { refresh: true });
@@ -159,52 +157,6 @@ const rechirper = computed(() => {
 
 <template>
     <div class="flex flex-col hover:bg-gray-50 relative">
-        <div class="absolute top-3 right-5">
-            <Dropdown
-                v-if="chirpData.user.id === $page.props.auth.user.id"
-                class="z-50 pointer-events-auto absolute"
-            >
-                <template #trigger>
-                    <button
-                        class="pointer-events-auto active:bg-gray-300 hover:bg-gray-200 h-7 w-7 flex items-center justify-center rounded-full transition-all ease-out"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 text-gray-400"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                        >
-                            <path
-                                d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"
-                            />
-                        </svg>
-                    </button>
-                </template>
-                <template #content>
-                    <button
-                        class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out"
-                        @click="editing = true"
-                    >
-                        Edit
-                    </button>
-                    <DropdownLink
-                        as="button"
-                        :href="
-                            route('chirps.destroy', {
-                                chirp: chirpData.id,
-                                _query: {
-                                    context: context,
-                                },
-                            })
-                        "
-                        @click="refreshData"
-                        method="delete"
-                    >
-                        Delete
-                    </DropdownLink>
-                </template>
-            </Dropdown>
-        </div>
         <div class="relative">
             <Chirp
                 v-if="
@@ -229,429 +181,481 @@ const rechirper = computed(() => {
             Rechirped by
             {{ rechirper }}
         </div>
-        <div class="px-6 py-3 flex relative gap-3">
-            <div class="z-10 pointer-events-none">
-                <Link
-                    :href="route(`profile.show`, chirpData.user.id)"
-                    class="pointer-events-auto z-10"
+        <!-- Main Chirp Content -->
+        <div class="relative">
+            <div class="absolute top-3 right-5">
+                <Dropdown
+                    v-if="chirpData.user.id === $page.props.auth.user.id"
+                    class="z-50 pointer-events-auto absolute"
                 >
-                    <img
-                        :src="profilePicture"
-                        alt="Profile Picture"
-                        class="rounded-full h-10 w-10 object-cover"
-                    />
-                </Link>
+                    <template #trigger>
+                        <button
+                            class="pointer-events-auto active:bg-gray-300 hover:bg-gray-200 h-7 w-7 flex items-center justify-center rounded-full transition-all ease-out"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 text-gray-400"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"
+                                />
+                            </svg>
+                        </button>
+                    </template>
+                    <template #content>
+                        <button
+                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out"
+                            @click="editing = true"
+                        >
+                            Edit
+                        </button>
+                        <DropdownLink
+                            as="button"
+                            :href="
+                                route('chirps.destroy', {
+                                    chirp: chirpData.id,
+                                    _query: {
+                                        context: context,
+                                    },
+                                })
+                            "
+                            @click="refreshData"
+                            method="delete"
+                        >
+                            Delete
+                        </DropdownLink>
+                    </template>
+                </Dropdown>
             </div>
-
-            <div class="flex-1 z-10">
-                <div class="pointer-events-none">
-                    <div class="flex justify-between items-center">
-                        <div :class="chirpClass" class="text-base">
+            <div class="px-6 py-3 flex relative gap-3">
+                <div class="z-10 pointer-events-none">
+                    <Link
+                        :href="route(`profile.show`, chirpData.user.id)"
+                        class="pointer-events-auto z-10"
+                    >
+                        <img
+                            :src="profilePicture"
+                            alt="Profile Picture"
+                            class="rounded-full h-10 w-10 object-cover"
+                        />
+                    </Link>
+                </div>
+                <div class="flex-1 z-10">
+                    <div class="pointer-events-none">
+                        <div class="flex justify-between items-center">
+                            <div :class="chirpClass" class="text-base">
+                                <Link
+                                    :href="
+                                        route(`profile.show`, chirpData.user.id)
+                                    "
+                                    class="text-gray-800 pointer-events-auto font-bold hidden md:block"
+                                    >{{
+                                        truncate(
+                                            chirpData.user.name,
+                                            nameTruncateLength
+                                        )
+                                    }}</Link
+                                >
+                                <Link
+                                    :href="
+                                        route(`profile.show`, chirpData.user.id)
+                                    "
+                                    class="text-gray-800 pointer-events-auto font-bold block md:hidden"
+                                    >{{
+                                        truncate(chirpData.user.name, 8)
+                                    }}</Link
+                                >
+                                <p class="text-gray-500">
+                                    @{{ truncate(chirpData.user.username, 8) }}
+                                </p>
+                                <small
+                                    class="text-xs text-gray-600"
+                                    v-if="!mainChirp"
+                                    >&bull;
+                                    {{
+                                        dayjs(chirpData.created_at).fromNow(
+                                            true
+                                        )
+                                    }}</small
+                                >
+                                <small
+                                    v-if="
+                                        chirpData.created_at !==
+                                            chirpData.updated_at && !mainChirp
+                                    "
+                                    class="text-sm text-gray-600"
+                                    >&middot; edited</small
+                                >
+                            </div>
+                        </div>
+                        <form
+                            v-if="editing && !mainChirp"
+                            @submit.prevent="
+                                form.put(route('chirps.update', chirpData.id), {
+                                    onSuccess: () => {
+                                        editing = false;
+                                        refreshData();
+                                    },
+                                })
+                            "
+                            class="z-20"
+                        >
+                            <textarea
+                                v-model="form.message"
+                                class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                            ></textarea>
+                            <InputError
+                                :message="form.errors.message"
+                                class="mt-2"
+                            />
+                            <div class="z-20 space-x-2 pointer-events-auto">
+                                <PrimaryButton class="z-10 mt-4"
+                                    >Save</PrimaryButton
+                                >
+                                <button
+                                    class="mt-4"
+                                    @click="
+                                        editing = false;
+                                        form.reset();
+                                        form.clearErrors();
+                                    "
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <div
+                            v-else-if="
+                                !route().current('chirp.show', chirpData.id) &&
+                                !editing &&
+                                !mainChirp
+                            "
+                        >
                             <Link
-                                :href="route(`profile.show`, chirpData.user.id)"
-                                class="text-gray-800 pointer-events-auto font-bold hidden md:block"
-                                >{{
-                                    truncate(
-                                        chirpData.user.name,
-                                        nameTruncateLength
-                                    )
-                                }}</Link
+                                :href="route('chirp.show', chirpData.id)"
+                                class="z-10 text-lg text-gray-900 mb-2 pointer-events-auto"
                             >
-                            <Link
-                                :href="route(`profile.show`, chirpData.user.id)"
-                                class="text-gray-800 pointer-events-auto font-bold block md:hidden"
-                                >{{ truncate(chirpData.user.name, 8) }}</Link
-                            >
-                            <p class="text-gray-500">
-                                @{{ truncate(chirpData.user.username, 8) }}
-                            </p>
-                            <small
-                                class="text-xs text-gray-600"
-                                v-if="!mainChirp"
-                                >&bull;
-                                {{
-                                    dayjs(chirpData.created_at).fromNow(true)
-                                }}</small
-                            >
-                            <small
-                                v-if="
-                                    chirpData.created_at !==
-                                        chirpData.updated_at && !mainChirp
-                                "
-                                class="text-sm text-gray-600"
-                                >&middot; edited</small
+                                {{ chirpData.message }}</Link
                             >
                         </div>
                     </div>
-                    <form
-                        v-if="editing && !mainChirp"
-                        @submit.prevent="
-                            form.put(route('chirps.update', chirpData.id), {
-                                onSuccess: () => {
-                                    editing = false;
-                                    refreshData();
-                                },
-                            })
-                        "
-                        class="z-20"
-                    >
-                        <textarea
-                            v-model="form.message"
-                            class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
-                        ></textarea>
-                        <InputError
-                            :message="form.errors.message"
-                            class="mt-2"
+                    <div class="mt-2">
+                        <ChirpMedia
+                            :chirp="chirpData"
+                            v-if="
+                                media.length > 0 &&
+                                !mainChirp &&
+                                context !== 'quote'
+                            "
+                            :media="media"
+                            @update-chirp-data="updateChirpData"
                         />
-                        <div class="z-20 space-x-2 pointer-events-auto">
-                            <PrimaryButton class="z-10 mt-4"
-                                >Save</PrimaryButton
-                            >
-                            <button
-                                class="mt-4"
-                                @click="
-                                    editing = false;
-                                    form.reset();
-                                    form.clearErrors();
-                                "
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-
+                    </div>
                     <div
-                        v-else-if="
-                            !route().current('chirp.show', chirpData.id) &&
-                            !editing &&
+                        v-if="
+                            chirp.quote_id !== null &&
+                            context != 'quote' &&
                             !mainChirp
                         "
+                        class="border-2 rounded-lg mt-2"
                     >
-                        <Link
-                            :href="route('chirp.show', chirpData.id)"
-                            class="z-10 text-lg text-gray-900 mb-2 pointer-events-auto"
-                        >
-                            {{ chirpData.message }}</Link
-                        >
+                        <Chirp
+                            :chirp="chirp.quoted_chirp"
+                            @update-chirp-data="updateChirpData"
+                            context="quote"
+                        />
                     </div>
                 </div>
-                <div class="mt-2">
-                    <ChirpMedia
-                        :chirp="chirpData"
-                        v-if="
-                            media.length > 0 &&
-                            !mainChirp &&
-                            context !== 'quote'
-                        "
-                        :media="media"
-                        @update-chirp-data="updateChirpData"
-                    />
-                </div>
-                <div
-                    v-if="
-                        chirp.quote_id !== null &&
-                        context != 'quote' &&
-                        !mainChirp
-                    "
-                    class="border-2 rounded-lg mt-2"
-                >
-                    <Chirp
-                        :chirp="chirp.quoted_chirp"
-                        @update-chirp-data="updateChirpData"
-                        context="quote"
-                    />
-                </div>
+                <Link
+                    :href="route('chirp.show', chirpData.id)"
+                    v-if="!route().current('chirp.show', chirpData.id)"
+                    class="absolute h-full w-full top-0 left-0 z-0"
+                ></Link>
             </div>
-            <Link
-                :href="route('chirp.show', chirpData.id)"
-                v-if="!route().current('chirp.show', chirpData.id)"
-                class="absolute h-full w-full top-0 left-0 z-0"
-            ></Link>
-        </div>
-        <div v-if="context === 'quote'" class="mb-2">
-            <ChirpMedia
-                :chirp="chirpData"
-                v-if="media.length > 0"
-                :media="media"
-                @update-chirp-data="updateChirpData"
-            />
-        </div>
-        <div v-if="mainChirp" class="text-xl px-6 pb-4">
-            <form
-                v-if="editing && mainChirp"
-                @submit.prevent="
-                    form.put(route('chirps.update', chirpData.id), {
-                        onSuccess: () => (editing = false),
-                    })
-                "
-                class="z-20"
-            >
-                <textarea
-                    v-model="form.message"
-                    class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
-                ></textarea>
-                <InputError :message="form.errors.message" class="mt-2" />
-                <div class="z-20 space-x-4 pointer-events-auto">
-                    <PrimaryButton class="z-10 mt-4">Save</PrimaryButton>
-                    <button
-                        class="mt-4 text-base text-gray-600"
-                        @click="
-                            editing = false;
-                            form.reset();
-                            form.clearErrors();
-                        "
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </form>
-            <div v-else class="mb-4">
-                <div>{{ chirpData.message }}</div>
+            <div v-if="context === 'quote'" class="mb-2">
                 <ChirpMedia
                     :chirp="chirpData"
                     v-if="media.length > 0"
                     :media="media"
                     @update-chirp-data="updateChirpData"
                 />
-                <div
-                    v-if="chirp.quote_id !== null"
-                    class="border-2 rounded-lg mt-2"
+            </div>
+            <div v-if="mainChirp" class="text-xl px-6 pb-4">
+                <form
+                    v-if="editing && mainChirp"
+                    @submit.prevent="
+                        form.put(route('chirps.update', chirpData.id), {
+                            onSuccess: () => (editing = false),
+                        })
+                    "
+                    class="z-20"
                 >
-                    <Chirp
-                        :chirp="chirp.quoted_chirp"
-                        context="quote"
-                        :name-truncate-length="quoteNameTruncateLength"
+                    <textarea
+                        v-model="form.message"
+                        class="pointer-events-auto z-20 mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                    ></textarea>
+                    <InputError :message="form.errors.message" class="mt-2" />
+                    <div class="z-20 space-x-4 pointer-events-auto">
+                        <PrimaryButton class="z-10 mt-4">Save</PrimaryButton>
+                        <button
+                            class="mt-4 text-base text-gray-600"
+                            @click="
+                                editing = false;
+                                form.reset();
+                                form.clearErrors();
+                            "
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+                <div v-else class="mb-4">
+                    <div>{{ chirpData.message }}</div>
+                    <ChirpMedia
+                        :chirp="chirpData"
+                        v-if="media.length > 0"
+                        :media="media"
+                        @update-chirp-data="updateChirpData"
                     />
+                    <div
+                        v-if="chirp.quote_id !== null"
+                        class="border-2 rounded-lg mt-2"
+                    >
+                        <Chirp
+                            :chirp="chirp.quoted_chirp"
+                            context="quote"
+                            :name-truncate-length="quoteNameTruncateLength"
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="ps-6 pb-3 space-x-1" v-if="mainChirp">
+                <small class="text-sm text-gray-600">
+                    {{ currentTime.format("h:mm A &bull; MMM D, YYYY") }}
+                </small>
+                <small
+                    v-if="chirpData.created_at !== chirpData.updated_at"
+                    class="text-sm text-gray-600"
+                    >&bull; edited</small
+                >
+            </div>
 
-        <div class="ps-6 pb-3 space-x-1" v-if="mainChirp">
-            <small class="text-sm text-gray-600">
-                {{ currentTime.format("h:mm A &bull; MMM D, YYYY") }}
-            </small>
-            <small
-                v-if="chirpData.created_at !== chirpData.updated_at"
-                class="text-sm text-gray-600"
-                >&bull; edited</small
+            <!-- Small Action Row -->
+            <div
+                class="pt-1 pb-1 px-8 flex z-20 justify-around pb-2"
+                v-if="!isModal && !mainChirp && context !== 'quote'"
             >
-        </div>
-
-        <div
-            class="pt-1 pb-1 px-8 flex z-20 justify-around"
-            v-if="!isModal && !mainChirp && context !== 'quote'"
-        >
-            <div class="flex gap-3">
-                <button
-                    @click="isReplyModalShow = true"
-                    class="text-gray-500 flex items-center"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSize}`"
-                        >comment</span
+                <div class="flex gap-3">
+                    <button
+                        @click="isReplyModalShow = true"
+                        class="text-gray-500 flex items-center"
                     >
-                </button>
-                <div class="w-12">{{ replyCount }}</div>
+                        <span
+                            class="material-icons"
+                            :style="`font-size: ${iconSize}`"
+                            >comment</span
+                        >
+                    </button>
+                    <div class="w-12">{{ replyCount }}</div>
+                </div>
+                <div class="flex gap-3">
+                    <Dropdown class="z-50 pointer-events-auto relative">
+                        <template #trigger>
+                            <button
+                                class="text-green-600 active:animate-likeBounce flex items-center"
+                                v-if="isRechirped"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >cached</span
+                                >
+                            </button>
+                            <button
+                                class="text-gray-500 active:animate-likeBounce flex items-center"
+                                v-else
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >cached</span
+                                >
+                            </button>
+                        </template>
+                        <template #content>
+                            <button
+                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                                @click="rechirp"
+                                v-if="!isRechirped"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >cached</span
+                                >
+                                Rechirp
+                            </button>
+                            <button
+                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                                @click="unrechirp"
+                                v-if="isRechirped"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >cached</span
+                                >
+                                Undo Rechirp
+                            </button>
+                            <button
+                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                                @click="isQuoteModalShow = true"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >edit_note</span
+                                >
+                                Quote
+                            </button>
+                        </template>
+                    </Dropdown>
+                    <div class="w-12">{{ rechirpCount }}</div>
+                </div>
+                <div class="flex gap-3">
+                    <button
+                        class="text-red-600 active:animate-likeBounce flex items-center"
+                        v-if="isLiked"
+                        @click="unlikeChirp"
+                    >
+                        <span
+                            class="material-icons"
+                            :style="`font-size: ${iconSize}`"
+                            >favorite</span
+                        >
+                    </button>
+                    <button
+                        class="text-gray-500 active:animate-likeBounce flex items-center"
+                        v-else
+                        @click="likeChirp"
+                    >
+                        <span
+                            class="material-icons"
+                            :style="`font-size: ${iconSize}`"
+                            >favorite_border</span
+                        >
+                    </button>
+                    <div class="w-12">{{ likeCount }}</div>
+                </div>
             </div>
-            <div class="flex gap-3">
-                <Dropdown class="z-50 pointer-events-auto relative">
-                    <template #trigger>
-                        <button
-                            class="text-green-600 active:animate-likeBounce flex items-center"
-                            v-if="isRechirped"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >cached</span
-                            >
-                        </button>
-                        <button
-                            class="text-gray-500 active:animate-likeBounce flex items-center"
-                            v-else
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >cached</span
-                            >
-                        </button>
-                    </template>
-                    <template #content>
-                        <button
-                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
-                            @click="rechirp"
-                            v-if="!isRechirped"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >cached</span
-                            >
-                            Rechirp
-                        </button>
-                        <button
-                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
-                            @click="unrechirp"
-                            v-if="isRechirped"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >cached</span
-                            >
-                            Undo Rechirp
-                        </button>
-                        <button
-                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
-                            @click="isQuoteModalShow = true"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >edit_note</span
-                            >
-                            Quote
-                        </button>
-                    </template>
-                </Dropdown>
-
-                <div class="w-12">{{ rechirpCount }}</div>
-            </div>
-            <div class="flex gap-3">
-                <button
-                    class="text-red-600 active:animate-likeBounce flex items-center"
-                    v-if="isLiked"
-                    @click="unlikeChirp"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSize}`"
-                        >favorite</span
+            <div
+                class="py-2 px-8 flex z-10 justify-around border-t-2"
+                v-if="!isModal && mainChirp"
+            >
+                <div class="flex gap-3">
+                    <button
+                        @click="isReplyModalShow = true"
+                        class="text-gray-500 flex items-center"
                     >
-                </button>
-                <button
-                    class="text-gray-500 active:animate-likeBounce flex items-center"
-                    v-else
-                    @click="likeChirp"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSize}`"
-                        >favorite_border</span
+                        <span
+                            class="material-icons"
+                            :style="`font-size: ${iconSizeLg}`"
+                            >comment</span
+                        >
+                    </button>
+                    <div class="w-12">{{ replyCount }}</div>
+                </div>
+                <div class="flex gap-3">
+                    <Dropdown class="z-50 pointer-events-auto relative">
+                        <template #trigger>
+                            <button
+                                class="text-green-600 active:animate-likeBounce flex items-center"
+                                v-if="isRechirped"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSizeLg}`"
+                                    >cached</span
+                                >
+                            </button>
+                            <button
+                                class="text-gray-500 active:animate-likeBounce flex items-center"
+                                v-else
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSizeLg}`"
+                                    >cached</span
+                                >
+                            </button>
+                        </template>
+                        <template #content>
+                            <button
+                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                                @click="rechirp"
+                                v-if="!isRechirped"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >cached</span
+                                >
+                                Rechirp
+                            </button>
+                            <button
+                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                                @click="unrechirp"
+                                v-if="isRechirped"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >cached</span
+                                >
+                                Undo Rechirp
+                            </button>
+                            <button
+                                class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
+                                @click="isQuoteModalShow = true"
+                            >
+                                <span
+                                    class="material-icons"
+                                    :style="`font-size: ${iconSize}`"
+                                    >edit_note</span
+                                >
+                                Quote
+                            </button>
+                        </template>
+                    </Dropdown>
+                    <div class="w-12">{{ rechirpCount }}</div>
+                </div>
+                <div class="flex gap-3">
+                    <button
+                        class="text-red-600 active:animate-likeBounce flex items-center"
+                        v-if="isLiked"
+                        @click="unlikeChirp"
                     >
-                </button>
-                <div class="w-12">{{ likeCount }}</div>
-            </div>
-        </div>
-
-        <div
-            class="py-2 px-8 flex z-10 justify-around border-t-2"
-            v-if="!isModal && mainChirp"
-        >
-            <div class="flex gap-3">
-                <button
-                    @click="isReplyModalShow = true"
-                    class="text-gray-500 flex items-center"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSizeLg}`"
-                        >comment</span
+                        <span
+                            class="material-icons"
+                            :style="`font-size: ${iconSizeLg}`"
+                            >favorite</span
+                        >
+                    </button>
+                    <button
+                        class="text-gray-500 active:animate-likeBounce flex items-center"
+                        v-else
+                        @click="likeChirp"
                     >
-                </button>
-                <div class="w-12">{{ replyCount }}</div>
-            </div>
-            <div class="flex gap-3">
-                <Dropdown class="z-50 pointer-events-auto relative">
-                    <template #trigger>
-                        <button
-                            class="text-green-600 active:animate-likeBounce flex items-center"
-                            v-if="isRechirped"
+                        <span
+                            class="material-icons"
+                            :style="`font-size: ${iconSizeLg}`"
+                            >favorite_border</span
                         >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSizeLg}`"
-                                >cached</span
-                            >
-                        </button>
-                        <button
-                            class="text-gray-500 active:animate-likeBounce flex items-center"
-                            v-else
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSizeLg}`"
-                                >cached</span
-                            >
-                        </button>
-                    </template>
-                    <template #content>
-                        <button
-                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
-                            @click="rechirp"
-                            v-if="!isRechirped"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >cached</span
-                            >
-                            Rechirp
-                        </button>
-                        <button
-                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
-                            @click="unrechirp"
-                            v-if="isRechirped"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >cached</span
-                            >
-                            Undo Rechirp
-                        </button>
-                        <button
-                            class="blox w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out flex gap-2 items-center"
-                            @click="isQuoteModalShow = true"
-                        >
-                            <span
-                                class="material-icons"
-                                :style="`font-size: ${iconSize}`"
-                                >edit_note</span
-                            >
-                            Quote
-                        </button>
-                    </template>
-                </Dropdown>
-
-                <div class="w-12">{{ rechirpCount }}</div>
-            </div>
-            <div class="flex gap-3">
-                <button
-                    class="text-red-600 active:animate-likeBounce flex items-center"
-                    v-if="isLiked"
-                    @click="unlikeChirp"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSizeLg}`"
-                        >favorite</span
-                    >
-                </button>
-                <button
-                    class="text-gray-500 active:animate-likeBounce flex items-center"
-                    v-else
-                    @click="likeChirp"
-                >
-                    <span
-                        class="material-icons"
-                        :style="`font-size: ${iconSizeLg}`"
-                        >favorite_border</span
-                    >
-                </button>
-                <div class="w-12">{{ likeCount }}</div>
+                    </button>
+                    <div class="w-12">{{ likeCount }}</div>
+                </div>
             </div>
         </div>
 
@@ -700,6 +704,7 @@ const rechirper = computed(() => {
             <NewChirpReplyInput
                 :chirp_id="chirpData.id"
                 @update-chirp-data="updateChirpData"
+                @new-chirp="newChirp"
                 class="pb-3"
             />
         </Modal>

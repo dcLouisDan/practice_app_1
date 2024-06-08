@@ -135,11 +135,12 @@ class ChirpController extends Controller
             }
         }
         $chirp->refresh()->load($this->chirpRelations);
+        $chirpNew->refresh()->load($this->chirpRelations);
         if ($chirp->user->id !== auth()->id()) {
             event(new ChirpReplied($chirp, auth()->user(), $validated['message']));
         }
 
-        return response()->json($chirp, 201);
+        return response()->json(['chirp' => $chirp, 'reply' => $chirpNew], 201);
     }
 
 
