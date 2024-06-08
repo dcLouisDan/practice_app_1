@@ -38,7 +38,7 @@ onMounted(adjustHeight);
 
 <template>
     <textarea
-        class="resize-none bg-inherit text-lg border-x-0 border-t-0 border-b-0 focus:border-b-2 focus:border-gray-300 focus:ring-0 w-full"
+        class="resize-none bg-inherit text-lg border-x-0 border-t-0 border-b-0 focus:border-b-2 focus:border-none focus:ring-0 w-full"
         v-model="content"
         ref="textarea"
         :placeholder="placeholder"

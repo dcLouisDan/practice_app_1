@@ -37,15 +37,15 @@ const notif = {
     rechirp: {
         icon: "cached",
         class: "text-green-500",
-        href: notificationData.value.chirp_id
-            ? route("chirp.show", notificationData.value.chirp_id)
+        href: notificationData.value?.chirp_id
+            ? route("chirp.show", notificationData.value?.chirp_id)
             : null,
     },
     quote: {
         icon: "cached",
         class: "text-green-500",
-        href: notificationData.value.chirp_id
-            ? route("chirp.show", notificationData.value.quote_chirp_id)
+        href: notificationData.value?.quote_chirp_id
+            ? route("chirp.show", notificationData.value?.quote_chirp_id)
             : null,
     },
 };
